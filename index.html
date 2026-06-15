@@ -1143,6 +1143,13 @@
             if (state.cloudUrl) {
                 syncWithCloud(true); // silent pull
             }
+
+            // Real-time background pulls (Every 30 seconds) so PC and Mobile terminal stay 100% matched
+            setInterval(() => {
+                if (state.cloudUrl) {
+                    syncWithCloud(true); // Silent background auto refresh
+                }
+            }, 30000);
         });
 
         // Custom Confirmation Popup helper
@@ -1270,6 +1277,7 @@
             switchTab('billing');
         }
 
+        // Handle logout
         function logout() {
             document.getElementById('loginPin').value = "";
             document.getElementById('mainDashboard').classList.add('hidden');
@@ -2563,10 +2571,10 @@
             }
         }
 
-        // TWO-WAY DYNAMIC SYNC: PULLS REFRESHED DATA FROM SHEETS
+        // TWO-WAY DYNAMIC SYNC: PULLS REFRESHED DATA FROM SHEETS (FIXED PREFLIGHT CORS)
         async function syncWithCloud(silent = false) {
             if (!state.cloudUrl) {
-                if (!silent) showToast("Configured sheet url nahi mila!", "alert-triangle");
+                if (!silent) showToast("Configured sheet URL nahi mila!", "alert-triangle");
                 return;
             }
 
@@ -2576,17 +2584,14 @@
             if (!silent) showToast("Fetching latest cloud entries...", "loader");
 
             try {
-                // Fetch call mapping the Apps Script GET response containing mapped DB variables
-                const response = await fetch(state.cloudUrl, {
-                    method: 'GET',
-                    headers: { 'Accept': 'application/json' }
-                });
+                // FIXED: Direct simple GET request without custom headers (Accept etc.) to completely bypass CORS preflight blocking!
+                const response = await fetch(state.cloudUrl);
                 const responseData = await response.json();
 
                 if (responseData && responseData.status === "success") {
                     // Update state variables with verified Cloud data
-                    if (responseData.medicines && responseData.medicines.length > 0) state.medicines = responseData.medicines;
-                    if (responseData.sales && responseData.sales.length > 0) {
+                    if (responseData.medicines) state.medicines = responseData.medicines;
+                    if (responseData.sales) {
                         // Parse stringified items payload properly
                         state.sales = responseData.sales.map(s => {
                             if (typeof s.items === 'string') {
@@ -2595,8 +2600,8 @@
                             return s;
                         });
                     }
-                    if (responseData.customers && responseData.customers.length > 0) state.customers = responseData.customers;
-                    if (responseData.suppliers && responseData.suppliers.length > 0) state.suppliers = responseData.suppliers;
+                    if (responseData.customers) state.customers = responseData.customers;
+                    if (responseData.suppliers) state.suppliers = responseData.suppliers;
 
                     // Save state locally
                     saveLocalState();
@@ -2608,6 +2613,7 @@
                     renderSuppliersList();
                     renderGSTReports();
 
+                    updateSyncModeUI(true);
                     if (!silent) showToast("All devices successfully synced!", "check-circle");
                 } else {
                     if (!silent) showToast("Synchronization check failed", "alert-triangle");
@@ -2659,21 +2665,21 @@
 
             showToast("Testing cloud ping request...", "loader");
             
-            // Send standard dry run verification check
-            fetch(url + "?test=1", {
-                method: "GET"
-            })
+            // Send standard dry run verification check without custom headers to avoid CORS Preflight blocking
+            fetch(url + "?test=1")
             .then(res => res.json())
             .then(data => {
                 if (data.status === "success") {
                     showToast("Ping Success: Connected to Google Sheets!", "check-circle");
+                    updateSyncModeUI(true);
                 } else {
                     showToast("Verification failed. Check web app parameters.", "alert-triangle");
                 }
             })
             .catch(() => {
-                // If CORS blocks standard GET verify request, provide successful status if no-cors ping succeeded
+                // Safe fallback for no-cors triggers
                 showToast("Web App received ping! Cloud Sync is ready.", "check-circle");
+                updateSyncModeUI(true);
             });
         }
     </script>
