@@ -114,8 +114,8 @@
 
     <!-- MAIN APP WRAPPER -->
     <div id="mainDashboard" class="hidden min-h-screen flex flex-col md:flex-row">
-        <!-- SIDEBAR -->
-        <aside class="no-print w-full md:w-64 bg-slate-900 dark:bg-slate-950 text-slate-300 flex flex-col border-r border-slate-800 shrink-0">
+        <!-- SIDEBAR (Desktop Screens Only) -->
+        <aside class="no-print hidden md:flex w-64 bg-slate-900 dark:bg-slate-950 text-slate-300 flex-col border-r border-slate-800 shrink-0">
             <!-- App Identity -->
             <div class="p-6 border-b border-slate-800 flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -174,15 +174,25 @@
         </aside>
 
         <!-- MAIN VIEW CONTENT AREA -->
-        <main class="flex-1 overflow-y-auto h-screen relative bg-slate-50 dark:bg-slate-900 pb-20 md:pb-0">
+        <main class="flex-1 overflow-y-auto h-screen relative bg-slate-50 dark:bg-slate-900 pb-28 md:pb-6">
             <!-- HEADER -->
-            <header class="no-print sticky top-0 z-10 bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 px-6 py-4 flex items-center justify-between">
+            <header class="no-print sticky top-0 z-10 bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 px-4 md:px-6 py-4 flex items-center justify-between">
                 <div>
-                    <h1 class="text-xl font-extrabold text-slate-900 dark:text-white" id="pageTitle">GST Billing Desk</h1>
-                    <p class="text-xs text-slate-400 dark:text-slate-500" id="pageSubtitle">Issue tax invoices, manage CGST/SGST/IGST, handle payments</p>
+                    <h1 class="text-lg md:text-xl font-extrabold text-slate-900 dark:text-white" id="pageTitle">GST Billing Desk</h1>
+                    <p class="text-[10px] md:text-xs text-slate-400 dark:text-slate-500" id="pageSubtitle">Issue tax invoices, manage CGST/SGST/IGST, handle payments</p>
                 </div>
 
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 md:gap-4">
+                    <!-- Real-time Two Way Sync action button -->
+                    <button id="headerSyncBtn" onclick="syncWithCloud()" title="Sync database with Cloud Google Sheets" class="p-2.5 bg-brand-50 hover:bg-brand-100 text-brand-600 dark:bg-slate-700 dark:text-slate-100 rounded-xl transition-all relative">
+                        <i data-lucide="refresh-cw" class="w-4.5 h-4.5"></i>
+                    </button>
+                    
+                    <button onclick="toggleDarkMode()" class="md:hidden p-2.5 text-slate-500 bg-slate-100 dark:bg-slate-700 dark:text-slate-100 rounded-xl transition-all" title="Toggle Theme">
+                        <i data-lucide="sun" id="sunIconMobile" class="w-4.5 h-4.5 hidden"></i>
+                        <i data-lucide="moon" id="moonIconMobile" class="w-4.5 h-4.5"></i>
+                    </button>
+
                     <div class="hidden md:flex flex-col text-right">
                         <span class="text-xs text-slate-400">Indian Rupee</span>
                         <span class="text-md font-bold text-slate-800 dark:text-white" id="headerSalesToday">₹0.00 Today</span>
@@ -194,20 +204,20 @@
             </header>
 
             <!-- CUSTOM INTERACTION NOTIFICATION BOX -->
-            <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out flex items-center gap-3 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-5 py-3.5 rounded-2xl shadow-2xl max-w-sm">
+            <div id="toastNotification" class="fixed bottom-24 md:bottom-6 right-4 md:right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out flex items-center gap-3 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-5 py-3.5 rounded-2xl shadow-2xl max-w-sm">
                 <span id="toastIcon" class="text-brand-500"><i data-lucide="check-circle" class="w-5 h-5"></i></span>
                 <p id="toastMessage" class="text-sm font-semibold"></p>
             </div>
 
             <!-- TABS ROOT -->
-            <div class="p-4 md:p-6 space-y-6">
+            <div class="p-3 md:p-6 space-y-6">
 
                 <!-- TAB: GST BILLING -->
-                <div id="tab-billing" class="tab-content grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div id="tab-billing" class="tab-content grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
                     <!-- Left Section: Search and Bill Items -->
-                    <div class="lg:col-span-8 space-y-6">
+                    <div class="lg:col-span-8 space-y-4 md:space-y-6">
                         <!-- Fast Medicine Search Card -->
-                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-5">
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-4 md:p-5">
                             <div class="flex flex-col md:flex-row md:items-center gap-3">
                                 <div class="flex-1 relative">
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i data-lucide="search" class="w-5 h-5"></i></span>
@@ -224,7 +234,7 @@
 
                         <!-- Active Invoice Items Container -->
                         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-                            <div class="p-5 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                            <div class="p-4 md:p-5 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
                                 <h3 class="font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                                     <i data-lucide="shopping-cart" class="w-5 h-5 text-brand-500"></i> Invoice Line Items
                                 </h3>
@@ -233,7 +243,7 @@
 
                             <!-- Cart Items Table -->
                             <div class="overflow-x-auto">
-                                <table class="w-full text-left border-collapse">
+                                <table class="w-full text-left border-collapse min-w-[600px]">
                                     <thead>
                                         <tr class="bg-slate-50 dark:bg-slate-900 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-700">
                                             <th class="py-4 px-5">Medicine Info</th>
@@ -263,9 +273,9 @@
                     </div>
 
                     <!-- Right Section: Invoice Customer, Pricing, Tax Calculation -->
-                    <div class="lg:col-span-4 space-y-6">
+                    <div class="lg:col-span-4 space-y-4 md:space-y-6">
                         <!-- Customer Association Info -->
-                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-5">
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-4 md:p-5">
                             <h3 class="font-extrabold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4 flex items-center justify-between">
                                 Customer Details
                                 <span class="text-[10px] text-brand-500 lowercase">Fast billing</span>
@@ -287,7 +297,7 @@
                         </div>
 
                         <!-- Bill Calculator -->
-                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-5 space-y-4">
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-4 md:p-5 space-y-4">
                             <h3 class="font-extrabold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2"><i data-lucide="calculator" class="w-4 h-4"></i> Pricing Summary</h3>
                             
                             <div class="space-y-2 border-b border-slate-100 dark:border-slate-700 pb-3 text-sm">
@@ -402,7 +412,7 @@
                     <!-- Medicine Inventory Table Card -->
                     <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
+                            <table class="w-full text-left border-collapse min-w-[700px]">
                                 <thead>
                                     <tr class="bg-slate-50 dark:bg-slate-900 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-700">
                                         <th class="py-4 px-5">Medicine/Generic</th>
@@ -427,38 +437,38 @@
                 <div id="tab-dashboard" class="tab-content hidden space-y-6">
                     <!-- Stat Counters -->
                     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                        <div class="bg-white dark:bg-slate-800 p-4 md:p-5 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center justify-between">
                             <div>
-                                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Today's Sales</span>
-                                <h4 id="dashTodaySales" class="text-xl md:text-2xl font-black text-brand-600 mt-1">₹0.00</h4>
-                                <p class="text-[10px] text-slate-400 mt-0.5" id="dashTodayCount">0 Invoices issued</p>
+                                <span class="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider">Today's Sales</span>
+                                <h4 id="dashTodaySales" class="text-lg md:text-2xl font-black text-brand-600 mt-1">₹0.00</h4>
+                                <p class="text-[9px] md:text-[10px] text-slate-400 mt-0.5" id="dashTodayCount">0 Invoices issued</p>
                             </div>
                             <div class="p-3 bg-brand-50 dark:bg-brand-950/20 text-brand-600 rounded-xl hidden md:block"><i data-lucide="receipt" class="w-6 h-6"></i></div>
                         </div>
 
-                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                        <div class="bg-white dark:bg-slate-800 p-4 md:p-5 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center justify-between">
                             <div>
-                                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Estimated Profit</span>
-                                <h4 id="dashNetProfit" class="text-xl md:text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">₹0.00</h4>
-                                <p class="text-[10px] text-slate-400 mt-0.5">Based on cost-margin</p>
+                                <span class="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider">Estimated Profit</span>
+                                <h4 id="dashNetProfit" class="text-lg md:text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">₹0.00</h4>
+                                <p class="text-[9px] md:text-[10px] text-slate-400 mt-0.5">Based on cost-margin</p>
                             </div>
                             <div class="p-3 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 rounded-xl hidden md:block"><i data-lucide="trending-up" class="w-6 h-6"></i></div>
                         </div>
 
-                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                        <div class="bg-white dark:bg-slate-800 p-4 md:p-5 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center justify-between">
                             <div>
-                                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Stock Valuation</span>
-                                <h4 id="dashStockValue" class="text-xl md:text-2xl font-black text-violet-600 mt-1">₹0.00</h4>
-                                <p class="text-[10px] text-slate-400 mt-0.5">Total assets in shop</p>
+                                <span class="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider">Stock Valuation</span>
+                                <h4 id="dashStockValue" class="text-lg md:text-2xl font-black text-violet-600 mt-1">₹0.00</h4>
+                                <p class="text-[9px] md:text-[10px] text-slate-400 mt-0.5">Total assets in shop</p>
                             </div>
                             <div class="p-3 bg-violet-50 dark:bg-violet-950/20 text-violet-600 rounded-xl hidden md:block"><i data-lucide="database" class="w-6 h-6"></i></div>
                         </div>
 
-                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                        <div class="bg-white dark:bg-slate-800 p-4 md:p-5 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center justify-between">
                             <div>
-                                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Critical Alerts</span>
-                                <h4 id="dashAlertsCount" class="text-xl md:text-2xl font-black text-rose-600 mt-1">0</h4>
-                                <p class="text-[10px] text-slate-400 mt-0.5" id="dashAlertsSummary">0 low / 0 expired medicines</p>
+                                <span class="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider">Critical Alerts</span>
+                                <h4 id="dashAlertsCount" class="text-lg md:text-2xl font-black text-rose-600 mt-1">0</h4>
+                                <p class="text-[9px] md:text-[10px] text-slate-400 mt-0.5" id="dashAlertsSummary">0 low / 0 expired medicines</p>
                             </div>
                             <div class="p-3 bg-rose-50 dark:bg-rose-950/20 text-rose-600 rounded-xl hidden md:block"><i data-lucide="alert-octagon" class="w-6 h-6"></i></div>
                         </div>
@@ -473,7 +483,7 @@
                                 <span class="text-xs font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 px-2.5 py-1 rounded-full">Today's Ledger</span>
                             </div>
                             <div class="overflow-x-auto">
-                                <table class="w-full text-left border-collapse">
+                                <table class="w-full text-left border-collapse min-w-[500px]">
                                     <thead>
                                         <tr class="bg-slate-50 dark:bg-slate-900 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-700">
                                             <th class="py-3.5 px-5">Invoice No</th>
@@ -519,21 +529,23 @@
 
                     <!-- Customers Grid/List -->
                     <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-slate-50 dark:bg-slate-900 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b">
-                                    <th class="py-4 px-5">Name</th>
-                                    <th class="py-4 px-4">Mobile Number</th>
-                                    <th class="py-4 px-4">Billing Address</th>
-                                    <th class="py-4 px-4 text-right">Invoices Issued</th>
-                                    <th class="py-4 px-4 text-right font-bold">Total Sales (₹)</th>
-                                    <th class="py-4 px-5 text-center">CRM Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="customersTableBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm">
-                                <!-- CRM Rows loaded by JS -->
-                            </tbody>
-                        </table>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse min-w-[600px]">
+                                <thead>
+                                    <tr class="bg-slate-50 dark:bg-slate-900 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b">
+                                        <th class="py-4 px-5">Name</th>
+                                        <th class="py-4 px-4">Mobile Number</th>
+                                        <th class="py-4 px-4">Billing Address</th>
+                                        <th class="py-4 px-4 text-right">Invoices Issued</th>
+                                        <th class="py-4 px-4 text-right font-bold">Total Sales (₹)</th>
+                                        <th class="py-4 px-5 text-center">CRM Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customersTableBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm">
+                                    <!-- CRM Rows loaded by JS -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -553,21 +565,23 @@
                     </div>
 
                     <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-slate-50 dark:bg-slate-900 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b">
-                                    <th class="py-4 px-5">Distributor Name</th>
-                                    <th class="py-4 px-4">GSTIN Identification</th>
-                                    <th class="py-4 px-4">Contact Person</th>
-                                    <th class="py-4 px-4">Billing Address</th>
-                                    <th class="py-4 px-4 text-right font-bold">Outstanding Balance (₹)</th>
-                                    <th class="py-4 px-5 text-center">Manage Ledger</th>
-                                </tr>
-                            </thead>
-                            <tbody id="suppliersTableBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm">
-                                <!-- Supplier rows -->
-                            </tbody>
-                        </table>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse min-w-[600px]">
+                                <thead>
+                                    <tr class="bg-slate-50 dark:bg-slate-900 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b">
+                                        <th class="py-4 px-5">Distributor Name</th>
+                                        <th class="py-4 px-4">GSTIN Identification</th>
+                                        <th class="py-4 px-4">Contact Person</th>
+                                        <th class="py-4 px-4">Billing Address</th>
+                                        <th class="py-4 px-4 text-right font-bold">Outstanding Balance (₹)</th>
+                                        <th class="py-4 px-5 text-center">Manage Ledger</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="suppliersTableBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm">
+                                    <!-- Supplier rows -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -609,7 +623,7 @@
                             <button onclick="exportGSTCSV()" class="px-3.5 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export GSTR-1 CSV</button>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse text-xs">
+                            <table class="w-full text-left border-collapse text-xs min-w-[700px]">
                                 <thead>
                                     <tr class="bg-slate-50 dark:bg-slate-900 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b">
                                         <th class="py-3 px-5">Invoice Date</th>
@@ -735,6 +749,30 @@
             </div>
         </main>
     </div>
+
+    <!-- STICKY BOTTOM NAVIGATION BAR (Mobile Screens Only) -->
+    <nav class="no-print md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex items-center justify-around py-2 shadow-2xl">
+        <button onclick="switchTab('billing')" class="flex flex-col items-center gap-0.5 text-slate-400 focus:outline-none" id="mob-tab-billing">
+            <i data-lucide="receipt" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold">Billing</span>
+        </button>
+        <button onclick="switchTab('medicines')" class="flex flex-col items-center gap-0.5 text-slate-400 focus:outline-none" id="mob-tab-medicines">
+            <i data-lucide="pill" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold">Meds</span>
+        </button>
+        <button onclick="switchTab('dashboard')" class="flex flex-col items-center gap-0.5 text-slate-400 focus:outline-none" id="mob-tab-dashboard">
+            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold">Dashboard</span>
+        </button>
+        <button onclick="switchTab('customers')" class="flex flex-col items-center gap-0.5 text-slate-400 focus:outline-none" id="mob-tab-customers">
+            <i data-lucide="users" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold">CRM</span>
+        </button>
+        <button onclick="switchTab('settings')" class="flex flex-col items-center gap-0.5 text-slate-400 focus:outline-none" id="mob-tab-settings">
+            <i data-lucide="settings" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold">Profile</span>
+        </button>
+    </nav>
 
     <!-- MODAL: ADD/EDIT MEDICINE -->
     <div id="medicineModal" class="fixed inset-0 bg-slate-950/70 z-50 flex items-center justify-center p-4 hidden">
@@ -1100,6 +1138,11 @@
             renderCustomersList();
             renderSuppliersList();
             renderGSTReports();
+            
+            // Auto Sync with Cloud Sheets if configured on startup
+            if (state.cloudUrl) {
+                syncWithCloud(true); // silent pull
+            }
         });
 
         // Custom Confirmation Popup helper
@@ -1127,11 +1170,15 @@
                 document.documentElement.classList.remove('dark');
                 document.getElementById('sunIcon').classList.add('hidden');
                 document.getElementById('moonIcon').classList.remove('hidden');
+                document.getElementById('sunIconMobile').classList.add('hidden');
+                document.getElementById('moonIconMobile').classList.remove('hidden');
                 state.theme = 'light';
             } else {
                 document.documentElement.classList.add('dark');
                 document.getElementById('sunIcon').classList.remove('hidden');
                 document.getElementById('moonIcon').classList.add('hidden');
+                document.getElementById('sunIconMobile').classList.remove('hidden');
+                document.getElementById('moonIconMobile').classList.add('hidden');
                 state.theme = 'dark';
             }
         }
@@ -1271,11 +1318,11 @@
             document.getElementById('settingStaffPin').value = state.settings.staffPin;
         }
 
-        // Sidebar Navigation System
+        // Sidebar & Bottom Bar Navigation System
         function switchTab(tabId) {
             state.currentTab = tabId;
             
-            // Toggle Tab Buttons active styling
+            // Toggle Tab Buttons active styling (Desktop sidebar)
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('bg-brand-600', 'text-white');
                 btn.classList.add('text-slate-300');
@@ -1284,6 +1331,17 @@
             if (activeBtn) {
                 activeBtn.classList.remove('text-slate-300');
                 activeBtn.classList.add('bg-brand-600', 'text-white');
+            }
+
+            // Toggle Mobile Bottom Bar buttons styling
+            document.querySelectorAll('nav.md\\:hidden button').forEach(btn => {
+                btn.classList.remove('text-brand-500');
+                btn.classList.add('text-slate-400');
+            });
+            const activeMobBtn = document.getElementById(`mob-tab-${tabId}`);
+            if (activeMobBtn) {
+                activeMobBtn.classList.remove('text-slate-400');
+                activeMobBtn.classList.add('text-brand-500');
             }
 
             // Hide/Show Pages contents
@@ -2095,11 +2153,21 @@
 
             showConfirmModal(
                 "Delete Customer Profile?",
-                `Are you sure you want to delete the profile of "${target.name}"? This will delete all logged history.`,
+                `Are you sure you want to delete "${target.name}"? Dashboard and reports data will instantly disconnect unlinked profiles.`,
                 function() {
+                    // Instantly clean previous sales logs with this customer's phone reference to "Walk-in"
+                    state.sales.forEach(s => {
+                        if (s.customerPhone === target.phone) {
+                            s.customerName = "Walk-in Customer";
+                            s.customerPhone = "N/A";
+                        }
+                    });
+
                     state.customers.splice(idx, 1);
                     saveLocalState();
                     renderCustomersList();
+                    renderDashboardStats(); // Refresh dashboard list instantly
+                    renderGSTReports();     // Refresh reports list instantly
                     showToast("Customer profile deleted successfully", "trash-2");
 
                     if (state.cloudUrl) {
@@ -2229,20 +2297,22 @@
             salesToday.forEach(s => {
                 grossVal += s.roundedBill;
                 // Proportional estimation: Profit is roughly (Selling_MRP - Cost_Rate) on each line item
-                s.items.forEach(itm => {
-                    const matchedDrug = state.medicines.find(m => m.id === itm.id);
-                    if (matchedDrug) {
-                        const cost = parseFloat(matchedDrug.purchaseRate);
-                        const profit = (itm.mrp - cost) * itm.qtySelected;
-                        netProfit += profit;
-                    }
-                });
+                if (s.items && Array.isArray(s.items)) {
+                    s.items.forEach(itm => {
+                        const matchedDrug = state.medicines.find(m => m.id === itm.id);
+                        if (matchedDrug) {
+                            const cost = parseFloat(matchedDrug.purchaseRate);
+                            const profit = (itm.mrp - cost) * itm.qtySelected;
+                            netProfit += profit;
+                        }
+                    });
+                }
             });
 
             // Stock Asset Valuations
             let totalStockVal = 0;
             state.medicines.forEach(m => {
-                totalStockVal += parseFloat(m.mrp) * parseInt(m.qty);
+                totalStockVal += parseFloat(m.mrp || 0) * parseInt(m.qty || 0);
             });
 
             // Warning indicators count
@@ -2250,7 +2320,7 @@
             let expiredCount = 0;
             const now = new Date();
             state.medicines.forEach(m => {
-                const q = parseInt(m.qty);
+                const q = parseInt(m.qty || 0);
                 const exp = new Date(m.expiry);
                 if (q < 15) lowCount++;
                 if (exp <= now) expiredCount++;
@@ -2300,13 +2370,12 @@
             alertList.innerHTML = "";
 
             state.medicines.forEach(m => {
-                const q = parseInt(m.qty);
+                const q = parseInt(m.qty || 0);
                 const exp = new Date(m.expiry);
                 const daysLeft = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
 
                 if (q < 15 || daysLeft <= 60) {
                     let text = "";
-                    let icon = "alert-triangle";
                     let bg = "bg-rose-50 text-rose-700 dark:bg-rose-950/20 dark:text-rose-400";
                     
                     if (daysLeft <= 0) {
@@ -2365,13 +2434,15 @@
                 totalTaxCollected += (s.cgst + s.sgst + s.igst);
 
                 // Compute Net Profits on each product sold
-                s.items.forEach(itm => {
-                    const matched = state.medicines.find(m => m.id === itm.id);
-                    if (matched) {
-                        const cost = parseFloat(matched.purchaseRate);
-                        netProfit += (itm.mrp - cost) * itm.qtySelected;
-                    }
-                });
+                if (s.items && Array.isArray(s.items)) {
+                    s.items.forEach(itm => {
+                        const matched = state.medicines.find(m => m.id === itm.id);
+                        if (matched) {
+                            const cost = parseFloat(matched.purchaseRate);
+                            netProfit += (itm.mrp - cost) * itm.qtySelected;
+                        }
+                    });
+                }
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/10 transition-all";
@@ -2476,6 +2547,7 @@
             saveLocalState();
             updateSyncModeUI(true);
             showToast("Cloud configuration successfully updated", "check-circle");
+            syncWithCloud(); // perform instant pull
         }
 
         function updateSyncModeUI(isConnected) {
@@ -2488,6 +2560,63 @@
             } else {
                 dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
                 statusText.innerText = "Local Storage Mode";
+            }
+        }
+
+        // TWO-WAY DYNAMIC SYNC: PULLS REFRESHED DATA FROM SHEETS
+        async function syncWithCloud(silent = false) {
+            if (!state.cloudUrl) {
+                if (!silent) showToast("Configured sheet url nahi mila!", "alert-triangle");
+                return;
+            }
+
+            const syncBtn = document.getElementById('headerSyncBtn');
+            if (syncBtn) syncBtn.classList.add('animate-spin');
+
+            if (!silent) showToast("Fetching latest cloud entries...", "loader");
+
+            try {
+                // Fetch call mapping the Apps Script GET response containing mapped DB variables
+                const response = await fetch(state.cloudUrl, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
+                const responseData = await response.json();
+
+                if (responseData && responseData.status === "success") {
+                    // Update state variables with verified Cloud data
+                    if (responseData.medicines && responseData.medicines.length > 0) state.medicines = responseData.medicines;
+                    if (responseData.sales && responseData.sales.length > 0) {
+                        // Parse stringified items payload properly
+                        state.sales = responseData.sales.map(s => {
+                            if (typeof s.items === 'string') {
+                                try { s.items = JSON.parse(s.items); } catch(e) { s.items = []; }
+                            }
+                            return s;
+                        });
+                    }
+                    if (responseData.customers && responseData.customers.length > 0) state.customers = responseData.customers;
+                    if (responseData.suppliers && responseData.suppliers.length > 0) state.suppliers = responseData.suppliers;
+
+                    // Save state locally
+                    saveLocalState();
+
+                    // Re-render UI components
+                    renderMedicineTable();
+                    renderDashboardStats();
+                    renderCustomersList();
+                    renderSuppliersList();
+                    renderGSTReports();
+
+                    if (!silent) showToast("All devices successfully synced!", "check-circle");
+                } else {
+                    if (!silent) showToast("Synchronization check failed", "alert-triangle");
+                }
+            } catch (err) {
+                console.error("Cloud pull error:", err);
+                if (!silent) showToast("Network sync delayed. Operating locally.", "wifi-off");
+            } finally {
+                if (syncBtn) syncBtn.classList.remove('animate-spin');
             }
         }
 
@@ -2512,6 +2641,8 @@
             })
             .then(() => {
                 console.log(`Cloud Sync successfully uploaded payload: ${actionType}`);
+                // Silently refresh state after push to pull any updates from other terminals
+                setTimeout(() => syncWithCloud(true), 1500);
             })
             .catch(err => {
                 console.warn("Failed to sync directly with Google Sheets. Local storage intact.", err);
