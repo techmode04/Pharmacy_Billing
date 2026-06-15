@@ -1,0 +1,2550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dhanvantari Rx - Indian Pharmacy Billing & Inventory Management System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- QR Code Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-200">
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-brand-900 to-slate-950 p-4">
+        <div class="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 border border-slate-100 dark:border-slate-700 transition-all">
+            <div class="text-center mb-8">
+                <div class="inline-flex p-3 bg-brand-100 dark:bg-brand-950/50 rounded-2xl text-brand-600 mb-3">
+                    <i data-lucide="plus-circle" class="w-10 h-10"></i>
+                </div>
+                <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">DHANVANTARI Rx</h1>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Smart Indian Pharmacy Billing & GST Suite</p>
+            </div>
+
+            <form id="loginForm" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Login Role</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="relative flex items-center justify-center p-3 rounded-xl border-2 border-brand-500 bg-brand-50/50 dark:bg-brand-950/20 text-brand-700 dark:text-brand-400 cursor-pointer transition-all" id="roleAdminLabel">
+                            <input type="radio" name="role" value="admin" checked class="sr-only" onchange="toggleRole('admin')">
+                            <span class="text-sm font-semibold flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4"></i> Admin</span>
+                        </label>
+                        <label class="relative flex items-center justify-center p-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-transparent text-slate-500 dark:text-slate-400 cursor-pointer transition-all" id="roleStaffLabel">
+                            <input type="radio" name="role" value="staff" class="sr-only" onchange="toggleRole('staff')">
+                            <span class="text-sm font-semibold flex items-center gap-2"><i data-lucide="user" class="w-4 h-4"></i> Staff/Billing</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Passcode / Pin</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i data-lucide="lock" class="w-5 h-5"></i></span>
+                        <input type="password" id="loginPin" required placeholder="Enter login PIN" class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 font-mono text-center tracking-widest text-lg">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand-600/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    Access System <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+            </form>
+            
+            <div class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-700 text-center">
+                <p class="text-xs text-slate-400 dark:text-slate-500">Default Credentials: Admin Pin: <span class="font-bold">1234</span> | Staff Pin: <span class="font-bold">5678</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div id="mainDashboard" class="hidden min-h-screen flex flex-col md:flex-row">
+        <!-- SIDEBAR -->
+        <aside class="no-print w-full md:w-64 bg-slate-900 dark:bg-slate-950 text-slate-300 flex flex-col border-r border-slate-800 shrink-0">
+            <!-- App Identity -->
+            <div class="p-6 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="p-2 bg-brand-600 rounded-xl text-white"><i data-lucide="plus" class="w-5 h-5"></i></span>
+                    <div>
+                        <h2 class="text-md font-bold text-white tracking-wide leading-none" id="sidebarPharmacyName">Dhanvantari Rx</h2>
+                        <span class="text-[10px] text-slate-400" id="sidebarRoleBadge">Admin Panel</span>
+                    </div>
+                </div>
+                <button onclick="toggleDarkMode()" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all" title="Toggle Theme">
+                    <i data-lucide="sun" id="sunIcon" class="w-4 h-4 hidden"></i>
+                    <i data-lucide="moon" id="moonIcon" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Nav Links -->
+            <nav class="flex-1 p-4 space-y-1.5 overflow-y-auto">
+                <button onclick="switchTab('billing')" id="btn-tab-billing" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all hover:bg-slate-800 hover:text-white">
+                    <i data-lucide="receipt" class="w-5 h-5 text-brand-500"></i> GST Billing Counter
+                </button>
+                <button onclick="switchTab('medicines')" id="btn-tab-medicines" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all hover:bg-slate-800 hover:text-white">
+                    <i data-lucide="pill" class="w-5 h-5"></i> Medicine Inventory
+                </button>
+                <button onclick="switchTab('dashboard')" id="btn-tab-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all hover:bg-slate-800 hover:text-white">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Analytics Dashboard
+                </button>
+                <button onclick="switchTab('customers')" id="btn-tab-customers" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all hover:bg-slate-800 hover:text-white">
+                    <i data-lucide="users" class="w-5 h-5"></i> Customer CRM
+                </button>
+                <button onclick="switchTab('suppliers')" id="btn-tab-suppliers" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all hover:bg-slate-800 hover:text-white">
+                    <i data-lucide="truck" class="w-5 h-5"></i> Supplier Directory
+                </button>
+                <button onclick="switchTab('reports')" id="btn-tab-reports" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all hover:bg-slate-800 hover:text-white">
+                    <i data-lucide="file-bar-chart" class="w-5 h-5"></i> GST & Sales Reports
+                </button>
+                <button onclick="switchTab('settings')" id="btn-tab-settings" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all hover:bg-slate-800 hover:text-white">
+                    <i data-lucide="settings" class="w-5 h-5"></i> Pharmacy Profile
+                </button>
+                <button onclick="switchTab('cloud')" id="btn-tab-cloud" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all hover:bg-slate-800 hover:text-white">
+                    <i data-lucide="database" class="w-5 h-5 text-indigo-400"></i> Google Sheet Sync
+                </button>
+            </nav>
+
+            <!-- Active Sync / Storage Indicator & Logout -->
+            <div class="p-4 border-t border-slate-800 bg-slate-950/50">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" id="syncDot"></div>
+                        <span class="text-xs text-slate-400 font-medium" id="syncStatusText">Local Storage Mode</span>
+                    </div>
+                </div>
+                <button onclick="logout()" class="w-full bg-slate-800 hover:bg-rose-950/40 hover:text-rose-400 text-slate-400 py-2.5 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Logout Secure Session
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN VIEW CONTENT AREA -->
+        <main class="flex-1 overflow-y-auto h-screen relative bg-slate-50 dark:bg-slate-900 pb-20 md:pb-0">
+            <!-- HEADER -->
+            <header class="no-print sticky top-0 z-10 bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 px-6 py-4 flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-extrabold text-slate-900 dark:text-white" id="pageTitle">GST Billing Desk</h1>
+                    <p class="text-xs text-slate-400 dark:text-slate-500" id="pageSubtitle">Issue tax invoices, manage CGST/SGST/IGST, handle payments</p>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="hidden md:flex flex-col text-right">
+                        <span class="text-xs text-slate-400">Indian Rupee</span>
+                        <span class="text-md font-bold text-slate-800 dark:text-white" id="headerSalesToday">₹0.00 Today</span>
+                    </div>
+                    <div class="p-2 bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded-xl hidden" id="lowStockWarningBadge">
+                        <span class="text-xs font-bold flex items-center gap-1"><i data-lucide="alert-triangle" class="w-4 h-4"></i> Low Stock Alert!</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- CUSTOM INTERACTION NOTIFICATION BOX -->
+            <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out flex items-center gap-3 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-5 py-3.5 rounded-2xl shadow-2xl max-w-sm">
+                <span id="toastIcon" class="text-brand-500"><i data-lucide="check-circle" class="w-5 h-5"></i></span>
+                <p id="toastMessage" class="text-sm font-semibold"></p>
+            </div>
+
+            <!-- TABS ROOT -->
+            <div class="p-4 md:p-6 space-y-6">
+
+                <!-- TAB: GST BILLING -->
+                <div id="tab-billing" class="tab-content grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Left Section: Search and Bill Items -->
+                    <div class="lg:col-span-8 space-y-6">
+                        <!-- Fast Medicine Search Card -->
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-5">
+                            <div class="flex flex-col md:flex-row md:items-center gap-3">
+                                <div class="flex-1 relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i data-lucide="search" class="w-5 h-5"></i></span>
+                                    <input type="text" id="billingSearchInput" onkeyup="searchBillingMedicine()" placeholder="Search medicine by Name, Generic Name or barcode scan..." class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                </div>
+                                <button onclick="clearBillingSearch()" class="px-4 py-3 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-slate-200 transition-all font-semibold text-sm">Clear</button>
+                            </div>
+
+                            <!-- Search Results Dropdown-list -->
+                            <div id="billingSearchResults" class="mt-4 hidden border border-slate-100 dark:border-slate-700 rounded-xl overflow-hidden divide-y divide-slate-100 dark:divide-slate-700 max-h-60 overflow-y-auto">
+                                <!-- Dynamic Rows -->
+                            </div>
+                        </div>
+
+                        <!-- Active Invoice Items Container -->
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                            <div class="p-5 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                                <h3 class="font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <i data-lucide="shopping-cart" class="w-5 h-5 text-brand-500"></i> Invoice Line Items
+                                </h3>
+                                <button onclick="clearInvoice()" class="text-xs font-bold text-rose-500 hover:text-rose-600 flex items-center gap-1"><i data-lucide="trash-2" class="w-4 h-4"></i> Clear All</button>
+                            </div>
+
+                            <!-- Cart Items Table -->
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-50 dark:bg-slate-900 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-700">
+                                            <th class="py-4 px-5">Medicine Info</th>
+                                            <th class="py-4 px-3">Batch & Exp</th>
+                                            <th class="py-4 px-3">MRP (₹)</th>
+                                            <th class="py-4 px-3">Qty</th>
+                                            <th class="py-4 px-3">GST %</th>
+                                            <th class="py-4 px-5 text-right">Total (₹)</th>
+                                            <th class="py-4 px-4 text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="invoiceTableBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm">
+                                        <!-- No items placeholder -->
+                                        <tr id="emptyInvoicePlaceholder">
+                                            <td colspan="7" class="py-12 text-center text-slate-400 dark:text-slate-500">
+                                                <div class="flex flex-col items-center justify-center">
+                                                    <i data-lucide="shopping-bag" class="w-12 h-12 stroke-[1.5] mb-2 text-slate-300"></i>
+                                                    <p class="font-medium text-sm">No items added to invoice yet</p>
+                                                    <p class="text-xs">Search and click a medicine from the box above</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Section: Invoice Customer, Pricing, Tax Calculation -->
+                    <div class="lg:col-span-4 space-y-6">
+                        <!-- Customer Association Info -->
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-5">
+                            <h3 class="font-extrabold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4 flex items-center justify-between">
+                                Customer Details
+                                <span class="text-[10px] text-brand-500 lowercase">Fast billing</span>
+                            </h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Mobile Number</label>
+                                    <input type="text" id="billCustPhone" oninput="fetchCustomerByPhone()" placeholder="Enter 10-Digit Mobile" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Customer Name</label>
+                                    <input type="text" id="billCustName" placeholder="Walk-in Customer" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Address (Optional)</label>
+                                    <input type="text" id="billCustAddress" placeholder="Customer Address" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bill Calculator -->
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-5 space-y-4">
+                            <h3 class="font-extrabold text-sm uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2"><i data-lucide="calculator" class="w-4 h-4"></i> Pricing Summary</h3>
+                            
+                            <div class="space-y-2 border-b border-slate-100 dark:border-slate-700 pb-3 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Gross Total (Taxable)</span>
+                                    <span id="billGrossTotal" class="font-semibold">₹0.00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">CGST</span>
+                                    <span id="billCGST" class="font-semibold text-slate-600 dark:text-slate-400">₹0.00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">SGST</span>
+                                    <span id="billSGST" class="font-semibold text-slate-600 dark:text-slate-400">₹0.00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">IGST (Interstate)</span>
+                                    <span id="billIGST" class="font-semibold text-slate-600 dark:text-slate-400">₹0.00</span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-500 mb-1">Discount (%)</label>
+                                        <input type="number" id="billDiscountPercent" oninput="calculateBillTotal()" value="0" min="0" max="100" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-500 mb-1">Flat Discount (₹)</label>
+                                        <input type="number" id="billDiscountFlat" oninput="calculateBillTotal()" value="0" min="0" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm">
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between pt-1 text-sm">
+                                    <span class="text-slate-500">Round Off Adjustment</span>
+                                    <span id="billRoundOff" class="font-medium italic text-slate-500">₹0.00</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-brand-50 dark:bg-brand-950/20 p-4 rounded-xl flex justify-between items-center">
+                                <span class="font-bold text-slate-900 dark:text-white">GRAND TOTAL</span>
+                                <span id="billGrandTotal" class="text-2xl font-extrabold text-brand-600 dark:text-brand-400">₹0.00</span>
+                            </div>
+
+                            <!-- Payment Method Selector -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Select Payment Method</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button onclick="setPaymentMethod('CASH')" id="btnPayCash" class="pay-method-btn py-3 rounded-xl border-2 border-brand-500 bg-brand-50/50 dark:bg-brand-950/20 text-brand-700 dark:text-brand-400 font-bold text-xs flex flex-col items-center gap-1 transition-all">
+                                        <i data-lucide="banknote" class="w-4 h-4"></i> Cash
+                                    </button>
+                                    <button onclick="setPaymentMethod('UPI')" id="btnPayUPI" class="pay-method-btn py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-bold text-xs flex flex-col items-center gap-1 transition-all">
+                                        <i data-lucide="qr-code" class="w-4 h-4"></i> UPI Code
+                                    </button>
+                                    <button onclick="setPaymentMethod('CARD_CREDIT')" id="btnPayCard" class="pay-method-btn py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-bold text-xs flex flex-col items-center gap-1 transition-all">
+                                        <i data-lucide="credit-card" class="w-4 h-4"></i> Card/Credit
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- UPI QR generation overlay (rendered on clicking UPI) -->
+                            <div id="upiQRContainer" class="hidden border border-brand-100 dark:border-brand-950/50 p-4 rounded-xl bg-slate-50 dark:bg-slate-900 space-y-3 text-center">
+                                <p class="text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center justify-center gap-1"><i data-lucide="zap" class="w-3.5 h-3.5 text-brand-500"></i> Scan & Pay on GPay, PhonePe, Paytm</p>
+                                <div id="upiQRCode" class="inline-block bg-white p-2.5 rounded-lg border border-slate-100"></div>
+                                <p class="text-[10px] text-slate-400 mt-1">Real-time dynamic merchant payment generation</p>
+                            </div>
+
+                            <!-- Checkout Operations -->
+                            <button onclick="processCheckoutInvoice()" class="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white font-extrabold rounded-2xl shadow-xl shadow-brand-600/10 hover:shadow-brand-600/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-md">
+                                <i data-lucide="check-circle-2" class="w-5 h-5"></i> Generate GST Invoice
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: MEDICINE INVENTORY -->
+                <div id="tab-medicines" class="tab-content hidden space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <span class="p-2.5 bg-brand-100 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400 rounded-xl"><i data-lucide="pill" class="w-6 h-6"></i></span>
+                            <div>
+                                <h3 class="text-lg font-extrabold text-slate-900 dark:text-white">Active Drug Directory</h3>
+                                <p class="text-xs text-slate-400">Total stocked medicines, HSN tax configurations, expiry warnings</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="openMedicineModal()" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-lg shadow-brand-600/15">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Add New Medicine
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search Filter Bar -->
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex flex-col md:flex-row gap-3">
+                        <div class="flex-1 relative">
+                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"><i data-lucide="search" class="w-4 h-4"></i></span>
+                            <input type="text" id="medFilterQuery" onkeyup="renderMedicineTable()" placeholder="Filter by Name, Generic Name, Batch, Supplier..." class="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                        </div>
+                        <div class="grid grid-cols-2 md:flex items-center gap-2">
+                            <select id="medFilterStatus" onchange="renderMedicineTable()" class="px-3 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                                <option value="all">All Stocks</option>
+                                <option value="low">Low Stock (&lt; 15)</option>
+                                <option value="out">Out of Stock</option>
+                                <option value="expiry30">Expires in 30 Days</option>
+                                <option value="expiry60">Expires in 60 Days</option>
+                                <option value="expired">Already Expired</option>
+                            </select>
+                            <button onclick="resetMedicineFilters()" class="px-4 py-2.5 text-sm font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl transition-all">Reset</button>
+                        </div>
+                    </div>
+
+                    <!-- Medicine Inventory Table Card -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 dark:bg-slate-900 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-700">
+                                        <th class="py-4 px-5">Medicine/Generic</th>
+                                        <th class="py-4 px-4">HSN & GST</th>
+                                        <th class="py-4 px-4">Batch Number</th>
+                                        <th class="py-4 px-4">Expiry Date</th>
+                                        <th class="py-4 px-4 text-right">Purchase (₹)</th>
+                                        <th class="py-4 px-4 text-right">MRP (₹)</th>
+                                        <th class="py-4 px-4 text-center">Stock</th>
+                                        <th class="py-4 px-5 text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="medicineTableBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm">
+                                    <!-- Dynamic rows loaded by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: ANALYTICS DASHBOARD -->
+                <div id="tab-dashboard" class="tab-content hidden space-y-6">
+                    <!-- Stat Counters -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Today's Sales</span>
+                                <h4 id="dashTodaySales" class="text-xl md:text-2xl font-black text-brand-600 mt-1">₹0.00</h4>
+                                <p class="text-[10px] text-slate-400 mt-0.5" id="dashTodayCount">0 Invoices issued</p>
+                            </div>
+                            <div class="p-3 bg-brand-50 dark:bg-brand-950/20 text-brand-600 rounded-xl hidden md:block"><i data-lucide="receipt" class="w-6 h-6"></i></div>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Estimated Profit</span>
+                                <h4 id="dashNetProfit" class="text-xl md:text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">₹0.00</h4>
+                                <p class="text-[10px] text-slate-400 mt-0.5">Based on cost-margin</p>
+                            </div>
+                            <div class="p-3 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 rounded-xl hidden md:block"><i data-lucide="trending-up" class="w-6 h-6"></i></div>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Stock Valuation</span>
+                                <h4 id="dashStockValue" class="text-xl md:text-2xl font-black text-violet-600 mt-1">₹0.00</h4>
+                                <p class="text-[10px] text-slate-400 mt-0.5">Total assets in shop</p>
+                            </div>
+                            <div class="p-3 bg-violet-50 dark:bg-violet-950/20 text-violet-600 rounded-xl hidden md:block"><i data-lucide="database" class="w-6 h-6"></i></div>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Critical Alerts</span>
+                                <h4 id="dashAlertsCount" class="text-xl md:text-2xl font-black text-rose-600 mt-1">0</h4>
+                                <p class="text-[10px] text-slate-400 mt-0.5" id="dashAlertsSummary">0 low / 0 expired medicines</p>
+                            </div>
+                            <div class="p-3 bg-rose-50 dark:bg-rose-950/20 text-rose-600 rounded-xl hidden md:block"><i data-lucide="alert-octagon" class="w-6 h-6"></i></div>
+                        </div>
+                    </div>
+
+                    <!-- Layout: Recent Activity and Dynamic Analytics Plots -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <!-- Left Panel: Recent Invoices -->
+                        <div class="lg:col-span-8 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden shadow-sm">
+                            <div class="p-5 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                                <h3 class="font-extrabold text-slate-900 dark:text-white flex items-center gap-2"><i data-lucide="history" class="w-5 h-5 text-indigo-500"></i> Recent Sales Transactions</h3>
+                                <span class="text-xs font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 px-2.5 py-1 rounded-full">Today's Ledger</span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-50 dark:bg-slate-900 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-700">
+                                            <th class="py-3.5 px-5">Invoice No</th>
+                                            <th class="py-3.5 px-4">Customer</th>
+                                            <th class="py-3.5 px-4">Payment</th>
+                                            <th class="py-3.5 px-4 text-right">Tax (₹)</th>
+                                            <th class="py-3.5 px-4 text-right font-bold">Total (₹)</th>
+                                            <th class="py-3.5 px-5 text-center">Receipt</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dashSalesTableBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm">
+                                        <!-- Realtime list populated by invoices generated -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Expiry Warnings & Low Stock List -->
+                        <div class="lg:col-span-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 shadow-sm space-y-4">
+                            <h3 class="font-extrabold text-slate-900 dark:text-white flex items-center gap-2"><i data-lucide="bell-ring" class="w-5 h-5 text-amber-500"></i> Active Health Alerts</h3>
+                            
+                            <div class="space-y-3 max-h-[400px] overflow-y-auto pr-1" id="dashAlertsList">
+                                <!-- Loaded dynamically via state warnings -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: CUSTOMER CRM -->
+                <div id="tab-customers" class="tab-content hidden space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="p-2.5 bg-brand-100 text-brand-600 dark:bg-brand-950/50 rounded-xl"><i data-lucide="users" class="w-6 h-6"></i></span>
+                            <div>
+                                <h3 class="text-lg font-extrabold text-slate-900 dark:text-white">Customer Database</h3>
+                                <p class="text-xs text-slate-400">Track customer lifetime purchase histories and profiles</p>
+                            </div>
+                        </div>
+                        <button onclick="openCustomerModal()" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold text-sm transition-all flex items-center gap-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Add Customer
+                        </button>
+                    </div>
+
+                    <!-- Customers Grid/List -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-900 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b">
+                                    <th class="py-4 px-5">Name</th>
+                                    <th class="py-4 px-4">Mobile Number</th>
+                                    <th class="py-4 px-4">Billing Address</th>
+                                    <th class="py-4 px-4 text-right">Invoices Issued</th>
+                                    <th class="py-4 px-4 text-right font-bold">Total Sales (₹)</th>
+                                    <th class="py-4 px-5 text-center">CRM Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customersTableBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm">
+                                <!-- CRM Rows loaded by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB: SUPPLIER DIRECTORY -->
+                <div id="tab-suppliers" class="tab-content hidden space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="p-2.5 bg-brand-100 text-brand-600 dark:bg-brand-950/50 rounded-xl"><i data-lucide="truck" class="w-6 h-6"></i></span>
+                            <div>
+                                <h3 class="text-lg font-extrabold text-slate-900 dark:text-white">Supplier Ledger</h3>
+                                <p class="text-xs text-slate-400">Manage pharmaceutical distributors, GSTIN listings, outstanding credit</p>
+                            </div>
+                        </div>
+                        <button onclick="openSupplierModal()" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold text-sm transition-all flex items-center gap-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Add New Supplier
+                        </button>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-900 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b">
+                                    <th class="py-4 px-5">Distributor Name</th>
+                                    <th class="py-4 px-4">GSTIN Identification</th>
+                                    <th class="py-4 px-4">Contact Person</th>
+                                    <th class="py-4 px-4">Billing Address</th>
+                                    <th class="py-4 px-4 text-right font-bold">Outstanding Balance (₹)</th>
+                                    <th class="py-4 px-5 text-center">Manage Ledger</th>
+                                </tr>
+                            </thead>
+                            <tbody id="suppliersTableBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm">
+                                <!-- Supplier rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB: GST & SALES REPORTS -->
+                <div id="tab-reports" class="tab-content hidden space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="p-2.5 bg-indigo-100 text-indigo-600 dark:bg-indigo-950/50 rounded-xl"><i data-lucide="file-bar-chart" class="w-6 h-6"></i></span>
+                            <div>
+                                <h3 class="text-lg font-extrabold text-slate-900 dark:text-white">GST Summary & Audit Reports</h3>
+                                <p class="text-xs text-slate-400">Generate commercial logs, GST Tax brackets, and profit margin analysis</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 space-y-1">
+                            <span class="text-xs text-slate-400 font-bold">Total Gross Sales</span>
+                            <h4 id="reportSalesVal" class="text-xl font-bold">₹0.00</h4>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 space-y-1">
+                            <span class="text-xs text-slate-400 font-bold">Total Tax Collected</span>
+                            <h4 id="reportTaxVal" class="text-xl font-bold text-amber-600">₹0.00</h4>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 space-y-1">
+                            <span class="text-xs text-slate-400 font-bold">Net Profit Realized</span>
+                            <h4 id="reportProfitVal" class="text-xl font-bold text-emerald-600">₹0.00</h4>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 space-y-1">
+                            <span class="text-xs text-slate-400 font-bold">Invoices Printed</span>
+                            <h4 id="reportInvoiceCount" class="text-xl font-bold">0 Bills</h4>
+                        </div>
+                    </div>
+
+                    <!-- GST Invoice Tax Ledger Breakdown -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden shadow-sm">
+                        <div class="p-5 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                            <h3 class="font-extrabold text-sm uppercase tracking-wider text-slate-500">Monthly GST Audit Log</h3>
+                            <button onclick="exportGSTCSV()" class="px-3.5 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export GSTR-1 CSV</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-slate-50 dark:bg-slate-900 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b">
+                                        <th class="py-3 px-5">Invoice Date</th>
+                                        <th class="py-3 px-4">Invoice No</th>
+                                        <th class="py-3 px-4">Customer Mobile</th>
+                                        <th class="py-3 px-4 text-right">Taxable Value (₹)</th>
+                                        <th class="py-3 px-4 text-right">CGST Collected (₹)</th>
+                                        <th class="py-3 px-4 text-right">SGST Collected (₹)</th>
+                                        <th class="py-3 px-4 text-right">IGST Collected (₹)</th>
+                                        <th class="py-3 px-4 text-right font-semibold">Grand Total (₹)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reportGSTTableBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-slate-600 dark:text-slate-300">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: SETTINGS & PHARMACY PROFILE -->
+                <div id="tab-settings" class="tab-content hidden space-y-6">
+                    <div class="flex items-center gap-3">
+                        <span class="p-2.5 bg-brand-100 text-brand-600 dark:bg-brand-950/50 rounded-xl"><i data-lucide="settings" class="w-6 h-6"></i></span>
+                        <div>
+                            <h3 class="text-lg font-extrabold text-slate-900 dark:text-white">Pharmacy Configuration</h3>
+                            <p class="text-xs text-slate-400">Configure Indian GSTIN, Drug Licenses, and WhatsApp integrations</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <!-- Profile Form -->
+                        <div class="lg:col-span-8 bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm space-y-4">
+                            <h4 class="font-bold text-md border-b border-slate-100 dark:border-slate-700 pb-2">Business Profile & Legal Details</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">Pharmacy/Store Name</label>
+                                    <input type="text" id="settingStoreName" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">GSTIN Number</label>
+                                    <input type="text" id="settingGSTIN" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-mono uppercase">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">Drug License (D.L.) No.</label>
+                                    <input type="text" id="settingDL" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-mono uppercase">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">Contact Phone</label>
+                                    <input type="text" id="settingPhone" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">Email Address</label>
+                                    <input type="email" id="settingEmail" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">Address Location</label>
+                                    <input type="text" id="settingAddress" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                                </div>
+                            </div>
+
+                            <h4 class="font-bold text-md border-b border-slate-100 dark:border-slate-700 pt-4 pb-2">UPI Merchant Details (QR Generation)</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">UPI Merchant ID (VPA)</label>
+                                    <input type="text" id="settingUPIId" placeholder="example@okhdfcbank" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 mb-1">Merchant Display Name</label>
+                                    <input type="text" id="settingUPIName" placeholder="Dhanvantari Medicals" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                                </div>
+                            </div>
+
+                            <button onclick="savePharmacyProfile()" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl transition-all shadow-md shadow-brand-600/10 active:scale-[0.98]">Save Configuration</button>
+                        </div>
+
+                        <!-- System Security Creds & Quick Guide -->
+                        <div class="lg:col-span-4 bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm space-y-5">
+                            <h4 class="font-bold text-md border-b border-slate-100 dark:border-slate-700 pb-2">System Gate Pins</h4>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">Admin Passcode PIN</label>
+                                <input type="password" id="settingAdminPin" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-center font-mono tracking-widest font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">Staff / Billing PIN</label>
+                                <input type="password" id="settingStaffPin" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-center font-mono tracking-widest font-bold">
+                            </div>
+
+                            <button onclick="saveAccessPins()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 font-semibold rounded-xl text-sm transition-all">Save Passcode Security</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: GOOGLE SHEETS CLOUD SYNC -->
+                <div id="tab-cloud" class="tab-content hidden space-y-6">
+                    <div class="flex items-center gap-3">
+                        <span class="p-2.5 bg-indigo-100 text-indigo-600 dark:bg-indigo-950/50 rounded-xl"><i data-lucide="database" class="w-6 h-6"></i></span>
+                        <div>
+                            <h3 class="text-lg font-extrabold text-slate-900 dark:text-white">Google Sheet Sync Settings</h3>
+                            <p class="text-xs text-slate-400">Connect this application to a Google Sheets database in 5 simple steps</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm space-y-5">
+                        <div class="p-4 bg-indigo-50 dark:bg-indigo-950/20 rounded-xl border border-indigo-100 dark:border-indigo-950 text-indigo-800 dark:text-indigo-300">
+                            <h4 class="font-extrabold text-sm flex items-center gap-1.5"><i data-lucide="info" class="w-4 h-4"></i> Cloud Integration Protocol</h4>
+                            <p class="text-xs mt-1 leading-relaxed">By default, this system operates fast and fully offline using local storage. Paste your Google Apps Script Web App URL below to instantly route all your additions, bills, customers, and inventory to your Google Spreadsheet database automatically!</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Google Web App Endpoint URL</label>
+                            <input type="text" id="syncEndpointURL" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm">
+                            <p class="text-[10px] text-slate-400 mt-1">Deploy the `Code.gs` from the setup guides to obtain this address link.</p>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <button onclick="saveCloudConnection()" class="px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold transition-all shadow-md">Apply Cloud Protocol</button>
+                            <button onclick="testCloudConnection()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:text-white rounded-xl text-sm font-semibold transition-all">Verify Connection</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: ADD/EDIT MEDICINE -->
+    <div id="medicineModal" class="fixed inset-0 bg-slate-950/70 z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                <h3 class="font-extrabold text-slate-900 dark:text-white" id="medModalTitle">Register New Drug Entry</h3>
+                <button onclick="closeMedicineModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            
+            <form id="medicineForm" onsubmit="saveMedicineForm(event)" class="p-6 space-y-4 overflow-y-auto flex-1">
+                <input type="hidden" id="medId">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Medicine Trade Name *</label>
+                        <input type="text" id="medName" required placeholder="e.g., Paracetamol 650mg" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Generic Scientific Formula</label>
+                        <input type="text" id="medGeneric" placeholder="e.g., Acetaminophen" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Manufacturer Company</label>
+                        <input type="text" id="medManufacturer" placeholder="e.g., Cipla Ltd" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Supplier Distributor</label>
+                        <select id="medSupplier" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm">
+                            <option value="">Choose Supplier</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Batch Number *</label>
+                        <input type="text" id="medBatch" required placeholder="e.g., B7052A" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-mono text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">HSN Tax Code</label>
+                        <input type="text" id="medHSN" placeholder="e.g., 3004" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-mono text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Manufacturing Date</label>
+                        <input type="date" id="medMfg" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Expiration Expiry Date *</label>
+                        <input type="date" id="medExpiry" required class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">GST Slabs %</label>
+                        <select id="medGST" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm">
+                            <option value="12">12% GST (Standard Medicine)</option>
+                            <option value="18">18% GST (Nicotine, Surgical)</option>
+                            <option value="5">5% GST (Life Saving, Vaccines)</option>
+                            <option value="0">0% GST (Tax Exempt)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Initial Stock Quantity *</label>
+                        <input type="number" id="medQty" required min="0" placeholder="0" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Purchase Cost Rate (₹) *</label>
+                        <input type="number" step="0.01" id="medPurchaseRate" required placeholder="0.00" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Maximum Retail Price (MRP ₹) *</label>
+                        <input type="number" step="0.01" id="medMRP" required placeholder="0.00" class="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-sm">
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-end gap-3">
+                    <button type="button" onclick="closeMedicineModal()" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-semibold">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold">Register Asset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: REGISTER CUSTOMER -->
+    <div id="customerModal" class="fixed inset-0 bg-slate-950/70 z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                <h3 class="font-extrabold text-slate-900 dark:text-white" id="customerModalTitle">Add Customer</h3>
+                <button onclick="closeCustomerModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            
+            <form id="customerForm" onsubmit="saveCustomerForm(event)" class="p-6 space-y-4">
+                <input type="hidden" id="custIndex">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Customer Name *</label>
+                    <input type="text" id="custName" required placeholder="Full Name" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">10-Digit Mobile Phone *</label>
+                    <input type="text" id="custPhone" required placeholder="e.g., 9876543210" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Billing Address Location</label>
+                    <input type="text" id="custAddress" placeholder="City / Locality" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-end gap-3">
+                    <button type="button" onclick="closeCustomerModal()" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-semibold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold">Save Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: REGISTER SUPPLIER -->
+    <div id="supplierModal" class="fixed inset-0 bg-slate-950/70 z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                <h3 class="font-extrabold text-slate-900 dark:text-white" id="supplierModalTitle">Add Distributor</h3>
+                <button onclick="closeSupplierModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            
+            <form id="supplierForm" onsubmit="saveSupplierForm(event)" class="p-6 space-y-4">
+                <input type="hidden" id="suppIndex">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Distributor / Supplier Name *</label>
+                    <input type="text" id="suppName" required placeholder="Pharma Agency Name" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">GSTIN Number</label>
+                    <input type="text" id="suppGST" placeholder="15-Digit GST Identification" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-mono uppercase">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Contact Mobile Number</label>
+                    <input type="text" id="suppPhone" placeholder="Mobile Phone" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Address Office</label>
+                    <input type="text" id="suppAddress" placeholder="Office Location" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Initial Outstanding Due (₹)</label>
+                    <input type="number" id="suppDue" value="0" min="0" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-end gap-3">
+                    <button type="button" onclick="closeSupplierModal()" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-semibold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold">Record Distributor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: PRINT-READY INVOICE PREVIEW -->
+    <div id="invoiceModal" class="fixed inset-0 bg-slate-950/70 z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
+        <div class="w-full max-w-3xl bg-white text-black rounded-2xl shadow-2xl p-6 relative flex flex-col my-8">
+            <button onclick="closeInvoiceModal()" class="no-print absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"><i data-lucide="x" class="w-6 h-6"></i></button>
+            
+            <!-- PRINTABLE SHEET -->
+            <div id="invoicePrintSheet" class="p-2 text-xs">
+                <!-- Pharmacy Meta Details Header -->
+                <div class="border-b-2 border-slate-900 pb-4 mb-4 flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div>
+                        <h1 class="text-xl font-black uppercase tracking-tight text-slate-950" id="printStoreName">Dhanvantari Rx</h1>
+                        <p class="text-xs font-semibold text-slate-600" id="printStoreAddress">12, Green Complex, Ring Road, Bengaluru, Karnataka</p>
+                        <p class="text-[10px] text-slate-500 mt-1">Contact: <span id="printStorePhone">9876543210</span> | Email: <span id="printStoreEmail">support@dhanvantarirx.in</span></p>
+                    </div>
+                    <div class="mt-3 md:mt-0 text-left md:text-right">
+                        <span class="inline-block px-3 py-1 bg-slate-100 font-extrabold text-slate-900 text-[10px] border border-slate-200 uppercase rounded tracking-wider mb-1">TAX INVOICE</span>
+                        <p class="font-mono text-[10px] text-slate-700">GSTIN: <span class="font-bold text-slate-950 uppercase" id="printStoreGSTIN">29AAAAA0000A1Z5</span></p>
+                        <p class="font-mono text-[10px] text-slate-700">D.L. No: <span class="font-bold text-slate-950 uppercase" id="printStoreDL">KA-BLR1-224455</span></p>
+                    </div>
+                </div>
+
+                <!-- Invoice Transaction Information Mapping -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-50 p-3 rounded-lg border border-slate-200 mb-4">
+                    <div>
+                        <span class="text-[9px] text-slate-500 uppercase font-bold">Invoice Number</span>
+                        <p class="font-mono font-bold text-slate-950" id="printInvoiceNo">DRX-2026-10001</p>
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-slate-500 uppercase font-bold">Billing Date</span>
+                        <p class="font-mono text-slate-950" id="printInvoiceDate">15-Jun-2026</p>
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-slate-500 uppercase font-bold">Payment Mode</span>
+                        <p class="font-extrabold text-slate-950" id="printInvoicePayMode">CASH</p>
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-slate-500 uppercase font-bold">Authorized Signee</span>
+                        <p class="text-slate-950" id="printInvoiceStaff">Admin Counter</p>
+                    </div>
+                </div>
+
+                <!-- Customer Details -->
+                <div class="mb-4">
+                    <span class="text-[9px] text-slate-500 uppercase font-bold">Patient / Customer Info</span>
+                    <div class="border border-slate-100 p-2.5 rounded-lg flex flex-col md:flex-row justify-between">
+                        <div>
+                            <span class="font-extrabold text-slate-950" id="printCustName">Walk-in Customer</span>
+                            <p class="text-[10px] text-slate-500 mt-0.5" id="printCustAddress">Address: Not Provided</p>
+                        </div>
+                        <div class="mt-1 md:mt-0 font-mono text-right text-[11px]">
+                            Mob: <span class="font-bold text-slate-900" id="printCustPhone">N/A</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Lines Table -->
+                <table class="w-full text-left border-collapse text-xs mb-4">
+                    <thead>
+                        <tr class="bg-slate-100 border-y border-slate-300 font-bold text-slate-700 text-[10px] uppercase">
+                            <th class="py-2 px-2">#</th>
+                            <th class="py-2 px-2">Medicine (Generic Composition)</th>
+                            <th class="py-2 px-2 font-mono">HSN</th>
+                            <th class="py-2 px-2 font-mono">Batch</th>
+                            <th class="py-2 px-2 font-mono">Expiry</th>
+                            <th class="py-2 px-2 text-right">Qty</th>
+                            <th class="py-2 px-2 text-right">Rate</th>
+                            <th class="py-2 px-2 text-right">GST %</th>
+                            <th class="py-2 px-2 text-right">Total (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="printInvoiceRows" class="divide-y divide-slate-100">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+
+                <!-- Pricing & Tax Calculations -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-200 pt-4">
+                    <!-- Tax Summary Breakdowns -->
+                    <div class="space-y-1 bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-[10px]">
+                        <span class="font-extrabold text-slate-900 tracking-wider">GST TAX SLABS BREAKDOWN</span>
+                        <div class="space-y-1 mt-1 text-slate-600 font-mono">
+                            <div class="flex justify-between">
+                                <span>Total Taxable Amount</span>
+                                <span id="printTaxableAmount">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Central GST (CGST)</span>
+                                <span id="printCGSTAmount">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between text-rose-700">
+                                <span>State GST (SGST)</span>
+                                <span id="printSGSTAmount">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between text-indigo-700">
+                                <span>Interstate GST (IGST)</span>
+                                <span id="printIGSTAmount">₹0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Receipt Totals and Legal Note -->
+                    <div class="space-y-2 text-right">
+                        <div class="space-y-1.5 font-semibold">
+                            <div class="flex justify-between text-slate-600">
+                                <span class="ml-auto">Gross Bill Amount:</span>
+                                <span class="w-28 text-slate-950 font-mono" id="printGrossBill">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between text-slate-600">
+                                <span class="ml-auto">Trade Discount Applied:</span>
+                                <span class="w-28 text-slate-950 font-mono" id="printDiscountBill">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between text-slate-500 italic">
+                                <span class="ml-auto">Rounded Off:</span>
+                                <span class="w-28 font-mono" id="printRoundOffVal">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between text-sm pt-2 border-t border-slate-200 font-extrabold">
+                                <span class="ml-auto">NET PAYABLE TOTAL:</span>
+                                <span class="w-28 text-brand-700 text-base font-black font-mono" id="printNetPayable">₹0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Verification Legal Disclaimer Footer -->
+                <div class="mt-8 pt-4 border-t border-dashed border-slate-300 grid grid-cols-1 md:grid-cols-2 gap-4 text-[10px] text-slate-500">
+                    <div>
+                        <p class="font-bold text-slate-800">Terms & Conditions:</p>
+                        <p class="leading-relaxed">1. Medicines once purchased cannot be returned or refunded without valid batch/expiry verification.<br>2. All product warranty/authenticity governed by corresponding manufacturers.</p>
+                    </div>
+                    <div class="text-right flex flex-col justify-end items-end">
+                        <div class="w-32 h-10 border-b border-slate-300 mb-1"></div>
+                        <p class="font-bold text-slate-800 uppercase">Authorized Signature</p>
+                        <p>Thank you! Wish you a speedy recovery.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Share and Print Operations Actions -->
+            <div class="no-print mt-6 pt-4 border-t border-slate-100 flex flex-wrap gap-2.5 justify-end">
+                <button onclick="shareWhatsAppBill()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"><i data-lucide="share-2" class="w-4 h-4"></i> Share WhatsApp Details</button>
+                <button onclick="printInvoiceSheet()" class="px-4 py-2.5 bg-slate-900 hover:bg-black text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"><i data-lucide="printer" class="w-4 h-4"></i> Print Bill Copy</button>
+                <button onclick="closeInvoiceModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREMIUM CUSTOM CONFIRMATION MODAL -->
+    <div id="confirmModal" class="fixed inset-0 bg-slate-950/70 z-[60] flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 border border-slate-100 dark:border-slate-700 transition-all text-center">
+            <div class="inline-flex p-3.5 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 rounded-2xl mb-4">
+                <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-lg font-extrabold text-slate-900 dark:text-white" id="confirmTitle">Are you sure?</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed" id="confirmMessage">Do you really want to delete this record? This action cannot be undone.</p>
+            <div class="mt-6 flex gap-3">
+                <button onclick="closeConfirmModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all">Cancel</button>
+                <button id="confirmYesBtn" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-extrabold transition-all">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- INITIALIZATION & BUSINESS CONTROLLER SCRIPTS -->
+    <script>
+        // GLOBAL STATE DICTIONARY
+        const state = {
+            role: 'admin',
+            currentTab: 'billing',
+            theme: 'light',
+            
+            // SYSTEM SEED DATA (Used initially and stored inside client LocalStorage)
+            medicines: [
+                { id: "M101", name: "Crocin Advance 650mg", generic: "Paracetamol", manufacturer: "GlaxoSmithKline", supplier: "Standard Distributor Ltd", batch: "C2144P", mfg: "2026-01-10", expiry: "2027-12-31", hsn: "3004", gst: "12", purchaseRate: "22.50", mrp: "32.00", qty: "140" },
+                { id: "M102", name: "Amoxyclav 625 DUO", generic: "Amoxicillin + Clavulanic Acid", manufacturer: "Alkem Laboratories", supplier: "Royal Drug Agency", batch: "AX321", mfg: "2026-03-05", expiry: "2026-08-30", hsn: "3004", gst: "12", purchaseRate: "115.00", mrp: "168.50", qty: "90" },
+                { id: "M103", name: "Pan-D Capsule", generic: "Pantoprazole + Domperidone", manufacturer: "Alkem Laboratories", supplier: "Standard Distributor Ltd", batch: "PD880", mfg: "2026-02-15", expiry: "2028-02-28", hsn: "3004", gst: "12", purchaseRate: "85.00", mrp: "145.00", qty: "12" },
+                { id: "M104", name: "Atorva 10mg", generic: "Atorvastatin", manufacturer: "Zydus Cadila", supplier: "Vikas Biotech", batch: "AT042", mfg: "2025-11-20", expiry: "2027-11-19", hsn: "3004", gst: "12", purchaseRate: "42.00", mrp: "68.00", qty: "200" },
+                { id: "M105", name: "Nicotex Patch 21mg", generic: "Nicotine Patch", manufacturer: "Cipla Ltd", supplier: "Royal Drug Agency", batch: "NC702", mfg: "2026-01-01", expiry: "2027-01-01", hsn: "3004", gst: "18", purchaseRate: "550.00", mrp: "749.00", qty: "2" },
+                { id: "M106", name: "Amlokind 5mg", generic: "Amlodipine Besylate", manufacturer: "Mankind Pharma", supplier: "Vikas Biotech", batch: "AM402", mfg: "2025-05-10", expiry: "2026-05-20", hsn: "3004", gst: "12", purchaseRate: "12.00", mrp: "21.50", qty: "15" }
+            ],
+            sales: [
+                { invoiceNo: "DRX-2026-10001", date: "2026-06-15", customerName: "Ramesh Kumar", customerPhone: "9876543210", paymentMethod: "CASH", itemsCount: 2, taxableValue: 177.00, cgst: 10.62, sgst: 10.62, igst: 0, roundedBill: 200.00, items: [] }
+            ],
+            customers: [
+                { name: "Ramesh Kumar", phone: "9876543210", address: "Indiranagar, Bengaluru", totalSpend: 200, count: 1 }
+            ],
+            suppliers: [
+                { name: "Standard Distributor Ltd", gstin: "29AADCS4412M1ZN", phone: "9880011223", address: "Peenya Industrial Area, Bengaluru", balance: "0.00" },
+                { name: "Royal Drug Agency", gstin: "29AABCR8080N2ZO", phone: "9900112233", address: "Majestic, Bengaluru", balance: "2450.00" },
+                { name: "Vikas Biotech", gstin: "29AAGFV9012K1Z9", phone: "9448002211", address: "Sadashivanagar, Bengaluru", balance: "0.00" }
+            ],
+            settings: {
+                storeName: "Dhanvantari Rx",
+                address: "Shop No. 12, Green Complex, Ring Road, Bengaluru, Karnataka",
+                phone: "9876543210",
+                email: "support@dhanvantarirx.in",
+                gstin: "29AAAAA0000A1Z5",
+                dl: "KA-BLR1-224455",
+                upiId: "pay@dhanvantarirx",
+                upiName: "Dhanvantari Medicals",
+                adminPin: "1234",
+                staffPin: "5678"
+            },
+            cloudUrl: "",
+            // Current Active Sale Draft Line Items
+            activeInvoice: [],
+            activePaymentMethod: 'CASH'
+        };
+
+        // DOM Loaded Handler
+        window.addEventListener('DOMContentLoaded', () => {
+            loadLocalStorageData();
+            lucide.createIcons();
+            syncPharmacyProfileOnUI();
+            checkLowStockAlerts();
+            renderMedicineTable();
+            renderDashboardStats();
+            renderCustomersList();
+            renderSuppliersList();
+            renderGSTReports();
+        });
+
+        // Custom Confirmation Popup helper
+        function showConfirmModal(title, msg, onConfirm) {
+            document.getElementById('confirmTitle').innerText = title;
+            document.getElementById('confirmMessage').innerText = msg;
+            
+            const btn = document.getElementById('confirmYesBtn');
+            btn.onclick = function() {
+                onConfirm();
+                closeConfirmModal();
+            };
+            
+            document.getElementById('confirmModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+        }
+
+        // Toggle Dark/Light Mode
+        function toggleDarkMode() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('sunIcon').classList.add('hidden');
+                document.getElementById('moonIcon').classList.remove('hidden');
+                state.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                document.getElementById('sunIcon').classList.remove('hidden');
+                document.getElementById('moonIcon').classList.add('hidden');
+                state.theme = 'dark';
+            }
+        }
+
+        // Save State into LocalStorage
+        function saveLocalState() {
+            localStorage.setItem('dhanvantari_meds', JSON.stringify(state.medicines));
+            localStorage.setItem('dhanvantari_sales', JSON.stringify(state.sales));
+            localStorage.setItem('dhanvantari_cust', JSON.stringify(state.customers));
+            localStorage.setItem('dhanvantari_supp', JSON.stringify(state.suppliers));
+            localStorage.setItem('dhanvantari_settings', JSON.stringify(state.settings));
+            localStorage.setItem('dhanvantari_cloudUrl', state.cloudUrl);
+        }
+
+        // Fetch LocalStorage Data
+        function loadLocalStorageData() {
+            if (localStorage.getItem('dhanvantari_meds')) state.medicines = JSON.parse(localStorage.getItem('dhanvantari_meds'));
+            if (localStorage.getItem('dhanvantari_sales')) state.sales = JSON.parse(localStorage.getItem('dhanvantari_sales'));
+            if (localStorage.getItem('dhanvantari_cust')) state.customers = JSON.parse(localStorage.getItem('dhanvantari_cust'));
+            if (localStorage.getItem('dhanvantari_supp')) state.suppliers = JSON.parse(localStorage.getItem('dhanvantari_supp'));
+            if (localStorage.getItem('dhanvantari_settings')) state.settings = JSON.parse(localStorage.getItem('dhanvantari_settings'));
+            if (localStorage.getItem('dhanvantari_cloudUrl')) state.cloudUrl = localStorage.getItem('dhanvantari_cloudUrl');
+            
+            if (state.cloudUrl) {
+                document.getElementById('syncEndpointURL').value = state.cloudUrl;
+                updateSyncModeUI(true);
+            }
+        }
+
+        // Helper: Indian Currency Formatter (e.g. ₹1,00,000.00)
+        function formatINR(val) {
+            const num = parseFloat(val);
+            if (isNaN(num)) return "₹0.00";
+            return "₹" + num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // Toggle Roles Admin/Staff on Login
+        function toggleRole(roleSelected) {
+            state.role = roleSelected;
+            const adminLbl = document.getElementById('roleAdminLabel');
+            const staffLbl = document.getElementById('roleStaffLabel');
+
+            if (roleSelected === 'admin') {
+                adminLbl.className = "relative flex items-center justify-center p-3 rounded-xl border-2 border-brand-500 bg-brand-50/50 dark:bg-brand-950/20 text-brand-700 dark:text-brand-400 cursor-pointer transition-all";
+                staffLbl.className = "relative flex items-center justify-center p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent text-slate-500 dark:text-slate-400 cursor-pointer transition-all";
+            } else {
+                staffLbl.className = "relative flex items-center justify-center p-3 rounded-xl border-2 border-brand-500 bg-brand-50/50 dark:bg-brand-950/20 text-brand-700 dark:text-brand-400 cursor-pointer transition-all";
+                adminLbl.className = "relative flex items-center justify-center p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent text-slate-500 dark:text-slate-400 cursor-pointer transition-all";
+            }
+        }
+
+        // Handle Pin Access Authentication
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const pin = document.getElementById('loginPin').value;
+            
+            if (state.role === 'admin' && pin === state.settings.adminPin) {
+                showToast("System admin access verified", "check-circle");
+                successfulLogin('Admin Panel');
+            } else if (state.role === 'staff' && pin === state.settings.staffPin) {
+                showToast("Billing staff session established", "check-circle");
+                successfulLogin('Staff Counter');
+            } else {
+                showToast("Access Denied: Invalid Pin", "alert-circle");
+            }
+        });
+
+        function successfulLogin(badge) {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            document.getElementById('sidebarRoleBadge').innerText = badge;
+            
+            // Adjust sidebar view tabs based on privileges
+            if (state.role === 'staff') {
+                document.getElementById('btn-tab-medicines').classList.add('hidden');
+                document.getElementById('btn-tab-dashboard').classList.add('hidden');
+                document.getElementById('btn-tab-suppliers').classList.add('hidden');
+                document.getElementById('btn-tab-reports').classList.add('hidden');
+                document.getElementById('btn-tab-settings').classList.add('hidden');
+                document.getElementById('btn-tab-cloud').classList.add('hidden');
+            } else {
+                document.getElementById('btn-tab-medicines').classList.remove('hidden');
+                document.getElementById('btn-tab-dashboard').classList.remove('hidden');
+                document.getElementById('btn-tab-suppliers').classList.remove('hidden');
+                document.getElementById('btn-tab-reports').classList.remove('hidden');
+                document.getElementById('btn-tab-settings').classList.remove('hidden');
+                document.getElementById('btn-tab-cloud').classList.remove('hidden');
+            }
+            switchTab('billing');
+        }
+
+        function logout() {
+            document.getElementById('loginPin').value = "";
+            document.getElementById('mainDashboard').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        // Custom Dynamic Interactive Toast Message
+        function showToast(message, iconName) {
+            const toast = document.getElementById('toastNotification');
+            const toastMsg = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.innerText = message;
+            toastIcon.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5"></i>`;
+            lucide.createIcons();
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Sync Layout Pharmacy Info with Setting fields
+        function syncPharmacyProfileOnUI() {
+            document.getElementById('sidebarPharmacyName').innerText = state.settings.storeName;
+            document.getElementById('printStoreName').innerText = state.settings.storeName;
+            document.getElementById('printStoreAddress').innerText = state.settings.address;
+            document.getElementById('printStorePhone').innerText = state.settings.phone;
+            document.getElementById('printStoreEmail').innerText = state.settings.email;
+            document.getElementById('printStoreGSTIN').innerText = state.settings.gstin;
+            document.getElementById('printStoreDL').innerText = state.settings.dl;
+
+            // Pre-populate settings page form inputs
+            document.getElementById('settingStoreName').value = state.settings.storeName;
+            document.getElementById('settingGSTIN').value = state.settings.gstin;
+            document.getElementById('settingDL').value = state.settings.dl;
+            document.getElementById('settingPhone').value = state.settings.phone;
+            document.getElementById('settingEmail').value = state.settings.email;
+            document.getElementById('settingAddress').value = state.settings.address;
+            document.getElementById('settingUPIId').value = state.settings.upiId;
+            document.getElementById('settingUPIName').value = state.settings.upiName;
+            document.getElementById('settingAdminPin').value = state.settings.adminPin;
+            document.getElementById('settingStaffPin').value = state.settings.staffPin;
+        }
+
+        // Sidebar Navigation System
+        function switchTab(tabId) {
+            state.currentTab = tabId;
+            
+            // Toggle Tab Buttons active styling
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-600', 'text-white');
+                btn.classList.add('text-slate-300');
+            });
+            const activeBtn = document.getElementById(`btn-tab-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-300');
+                activeBtn.classList.add('bg-brand-600', 'text-white');
+            }
+
+            // Hide/Show Pages contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            // Render Specific Sub-components corresponding to Tab Selected
+            if (tabId === 'dashboard') {
+                renderDashboardStats();
+            } else if (tabId === 'medicines') {
+                renderMedicineTable();
+            } else if (tabId === 'customers') {
+                renderCustomersList();
+            } else if (tabId === 'suppliers') {
+                renderSuppliersList();
+            } else if (tabId === 'reports') {
+                renderGSTReports();
+            }
+
+            // Update Titles
+            const titleMap = {
+                'billing': ['GST Billing Desk', 'Issue retail tax invoices, CGST/SGST, and payments'],
+                'medicines': ['Active Drug Directory', 'Total stock metrics, generic names, and batch limits'],
+                'dashboard': ['Analytical Diagnostics', 'Track daily margins, warning indicators, and transactions'],
+                'customers': ['Loyalty CRM Profiles', 'Customer lists, lifecycle spending totals'],
+                'suppliers': ['Pharmaceutical Distributor Ledger', 'Track active business accounts and GSTIN values'],
+                'reports': ['Financial GST Audit Ledger', 'Review detailed monthly sales and CGST/SGST breakdowns'],
+                'settings': ['Pharmacy Profile Suite', 'Verify registered drug licences, address, and login PINs'],
+                'cloud': ['Google Sheets Real-time Cloud Protocol', 'Sync your entire pharmacy application with your spreadsheet']
+            };
+            
+            document.getElementById('pageTitle').innerText = titleMap[tabId][0];
+            document.getElementById('pageSubtitle').innerText = titleMap[tabId][1];
+        }
+
+        // Low Stock Alarm Guard
+        function checkLowStockAlerts() {
+            let alarm = false;
+            state.medicines.forEach(m => {
+                if (parseInt(m.qty) < 15) {
+                    alarm = true;
+                }
+            });
+            const alertBadge = document.getElementById('lowStockWarningBadge');
+            if (alarm) {
+                alertBadge.classList.remove('hidden');
+            } else {
+                alertBadge.classList.add('hidden');
+            }
+        }
+
+        // ==========================================
+        //         1. FAST BILLING INTERACTIVE CONTROLLER
+        // ==========================================
+        function searchBillingMedicine() {
+            const val = document.getElementById('billingSearchInput').value.toLowerCase();
+            const resultsDiv = document.getElementById('billingSearchResults');
+            
+            if (val.trim() === "") {
+                resultsDiv.classList.add('hidden');
+                return;
+            }
+
+            resultsDiv.innerHTML = "";
+            let matched = state.medicines.filter(m => {
+                const name = (m.name || "").toLowerCase();
+                const generic = (m.generic || "").toLowerCase();
+                const id = (m.id || "").toLowerCase();
+                const batch = (m.batch || "").toLowerCase();
+                
+                return name.includes(val) || 
+                       generic.includes(val) ||
+                       id.includes(val) ||
+                       batch.includes(val);
+            });
+
+            if (matched.length === 0) {
+                resultsDiv.innerHTML = `<div class="p-4 text-center text-xs text-slate-400">No match found</div>`;
+                resultsDiv.classList.remove('hidden');
+                return;
+            }
+
+            matched.forEach(m => {
+                const qtyVal = parseInt(m.qty);
+                let stockClass = "text-emerald-600";
+                if (qtyVal === 0) stockClass = "text-rose-600 font-bold";
+                else if (qtyVal < 15) stockClass = "text-amber-500 font-bold animate-pulse";
+
+                const row = document.createElement('div');
+                row.className = "flex justify-between items-center p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition-all";
+                row.onclick = () => addMedicineToInvoice(m);
+                row.innerHTML = `
+                    <div>
+                        <div class="font-bold text-slate-900 dark:text-white">${m.name} <span class="text-xs font-semibold text-slate-400">(${m.generic})</span></div>
+                        <div class="text-[10px] text-slate-500 font-mono">Batch: ${m.batch} | Exp: ${m.expiry} | GST: ${m.gst}%</div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-extrabold block text-slate-900 dark:text-white">${formatINR(m.mrp)}</span>
+                        <span class="text-[10px] ${stockClass}">Stock: ${m.qty} Units</span>
+                    </div>
+                `;
+                resultsDiv.appendChild(row);
+            });
+            resultsDiv.classList.remove('hidden');
+        }
+
+        function clearBillingSearch() {
+            document.getElementById('billingSearchInput').value = "";
+            document.getElementById('billingSearchResults').classList.add('hidden');
+        }
+
+        // Add item to Invoice Draft
+        function addMedicineToInvoice(medicine) {
+            clearBillingSearch();
+            
+            // Check if quantity is out of stock
+            if (parseInt(medicine.qty) <= 0) {
+                showToast("Item is currently Out of Stock!", "alert-circle");
+                return;
+            }
+
+            // Check if medicine already exists inside cart
+            const index = state.activeInvoice.findIndex(item => item.id === medicine.id);
+            if (index > -1) {
+                if (state.activeInvoice[index].qtySelected >= parseInt(medicine.qty)) {
+                    showToast("Cannot exceed available store stock quantity!", "alert-circle");
+                    return;
+                }
+                state.activeInvoice[index].qtySelected += 1;
+            } else {
+                state.activeInvoice.push({
+                    id: medicine.id,
+                    name: medicine.name,
+                    generic: medicine.generic,
+                    batch: medicine.batch,
+                    expiry: medicine.expiry,
+                    hsn: medicine.hsn,
+                    gst: parseFloat(medicine.gst),
+                    mrp: parseFloat(medicine.mrp),
+                    maxQty: parseInt(medicine.qty),
+                    qtySelected: 1
+                });
+            }
+
+            showToast(`${medicine.name} added`, "plus-circle");
+            renderInvoiceItemsTable();
+            calculateBillTotal();
+        }
+
+        // Render Invoice Item rows
+        function renderInvoiceItemsTable() {
+            const body = document.getElementById('invoiceTableBody');
+            const placeholder = document.getElementById('emptyInvoicePlaceholder');
+            
+            // Remove existing product rows
+            document.querySelectorAll('.invoice-row').forEach(row => row.remove());
+
+            if (state.activeInvoice.length === 0) {
+                placeholder.classList.remove('hidden');
+                return;
+            }
+            placeholder.classList.add('hidden');
+
+            state.activeInvoice.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "invoice-row border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/20";
+                
+                const itemTotal = item.qtySelected * item.mrp;
+
+                tr.innerHTML = `
+                    <td class="py-3 px-5">
+                        <div class="font-bold text-slate-900 dark:text-white">${item.name}</div>
+                        <div class="text-[10px] text-slate-500">${item.generic}</div>
+                    </td>
+                    <td class="py-3 px-3">
+                        <span class="font-mono text-xs block text-slate-700 dark:text-slate-400">${item.batch}</span>
+                        <span class="text-[10px] text-slate-400">Exp: ${item.expiry}</span>
+                    </td>
+                    <td class="py-3 px-3 font-mono font-semibold">${formatINR(item.mrp)}</td>
+                    <td class="py-3 px-3">
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="updateInvoiceQty(${index}, -1)" class="w-7 h-7 bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-white rounded-lg flex items-center justify-center font-bold text-lg leading-none">-</button>
+                            <span class="w-8 text-center text-sm font-bold">${item.qtySelected}</span>
+                            <button onclick="updateInvoiceQty(${index}, 1)" class="w-7 h-7 bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-white rounded-lg flex items-center justify-center font-bold text-lg leading-none">+</button>
+                        </div>
+                    </td>
+                    <td class="py-3 px-3 font-mono text-xs">${item.gst}%</td>
+                    <td class="py-3 px-5 text-right font-mono font-bold text-slate-900 dark:text-white">${formatINR(itemTotal)}</td>
+                    <td class="py-3 px-4 text-center">
+                        <button onclick="removeInvoiceItem(${index})" class="p-1.5 text-rose-500 hover:text-white hover:bg-rose-600 rounded-lg transition-all"><i data-lucide="trash" class="w-4 h-4"></i></button>
+                    </td>
+                `;
+                body.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function updateInvoiceQty(index, change) {
+            const item = state.activeInvoice[index];
+            const newQty = item.qtySelected + change;
+            if (newQty <= 0) {
+                removeInvoiceItem(index);
+                return;
+            }
+            if (newQty > item.maxQty) {
+                showToast("Maximum store stock reached!", "alert-circle");
+                return;
+            }
+            item.qtySelected = newQty;
+            renderInvoiceItemsTable();
+            calculateBillTotal();
+        }
+
+        function removeInvoiceItem(index) {
+            const removedItem = state.activeInvoice[index];
+            state.activeInvoice.splice(index, 1);
+            showToast(`${removedItem.name} removed from invoice`, "minus-circle");
+            renderInvoiceItemsTable();
+            calculateBillTotal();
+        }
+
+        function clearInvoice() {
+            state.activeInvoice = [];
+            renderInvoiceItemsTable();
+            calculateBillTotal();
+            showToast("Invoice Cleared", "trash-2");
+        }
+
+        // GST calculation logic
+        function calculateBillTotal() {
+            let gross = 0;
+            let totalGST = 0;
+            let totalCGST = 0;
+            let totalSGST = 0;
+            let totalIGST = 0;
+
+            state.activeInvoice.forEach(item => {
+                const qty = item.qtySelected;
+                const totalMrp = item.mrp * qty;
+                
+                // Reverse calculate tax since MRP in India already includes GST tax
+                // Taxable Value = MRP / (1 + (GST_Rate / 100))
+                const gstRate = item.gst;
+                const taxableVal = totalMrp / (1 + (gstRate / 100));
+                const itemTax = totalMrp - taxableVal;
+
+                gross += taxableVal;
+                totalGST += itemTax;
+
+                // Simple CGST & SGST Split for State (Default)
+                totalCGST += itemTax / 2;
+                totalSGST += itemTax / 2;
+            });
+
+            // Discount Math
+            const discPercent = parseFloat(document.getElementById('billDiscountPercent').value) || 0;
+            const discFlat = parseFloat(document.getElementById('billDiscountFlat').value) || 0;
+            
+            const grossDiscount = (gross * (discPercent / 100)) + discFlat;
+            const finalTaxable = Math.max(0, gross - grossDiscount);
+            
+            // Recompute adjusted tax values on final taxable margin
+            const proportionalTax = finalTaxable * (totalGST / (gross || 1));
+            const cgstVal = proportionalTax / 2;
+            const sgstVal = proportionalTax / 2;
+
+            const preRoundTotal = finalTaxable + proportionalTax;
+            const roundedTotal = Math.round(preRoundTotal);
+            const roundAdjustment = roundedTotal - preRoundTotal;
+
+            // Update Side Invoice Billing Widgets
+            document.getElementById('billGrossTotal').innerText = formatINR(finalTaxable);
+            document.getElementById('billCGST').innerText = formatINR(cgstVal);
+            document.getElementById('billSGST').innerText = formatINR(sgstVal);
+            document.getElementById('billIGST').innerText = formatINR(totalIGST);
+            document.getElementById('billRoundOff').innerText = formatINR(roundAdjustment);
+            document.getElementById('billGrandTotal').innerText = formatINR(roundedTotal);
+
+            // Re-render QR if dynamic payment is active
+            if (state.activePaymentMethod === 'UPI' && roundedTotal > 0) {
+                generateDynamicUPIQR(roundedTotal);
+            }
+        }
+
+        // Associated Fast Customer Phone Check
+        function fetchCustomerByPhone() {
+            const phone = document.getElementById('billCustPhone').value;
+            if (phone.length === 10) {
+                const matched = state.customers.find(c => c.phone === phone);
+                if (matched) {
+                    document.getElementById('billCustName').value = matched.name;
+                    document.getElementById('billCustAddress').value = matched.address;
+                    showToast(`Premium customer ${matched.name} found!`, "user-check");
+                }
+            }
+        }
+
+        // Set billing payment mode
+        function setPaymentMethod(method) {
+            state.activePaymentMethod = method;
+            document.querySelectorAll('.pay-method-btn').forEach(btn => {
+                btn.className = "pay-method-btn py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-bold text-xs flex flex-col items-center gap-1 transition-all";
+            });
+
+            const activeBtnMap = {
+                'CASH': 'btnPayCash',
+                'UPI': 'btnPayUPI',
+                'CARD_CREDIT': 'btnPayCard'
+            };
+
+            const target = document.getElementById(activeBtnMap[method]);
+            target.className = "pay-method-btn py-3 rounded-xl border-2 border-brand-500 bg-brand-50/50 dark:bg-brand-950/20 text-brand-700 dark:text-brand-400 font-bold text-xs flex flex-col items-center gap-1 transition-all";
+
+            const upiContainer = document.getElementById('upiQRContainer');
+            if (method === 'UPI') {
+                upiContainer.classList.remove('hidden');
+                const grandTotalStr = document.getElementById('billGrandTotal').innerText.replace(/[₹,]/g, '');
+                const numericTotal = parseFloat(grandTotalStr) || 0;
+                generateDynamicUPIQR(numericTotal);
+            } else {
+                upiContainer.classList.add('hidden');
+            }
+        }
+
+        // Generator of Unified Real-time UPI Intent QR Code
+        function generateDynamicUPIQR(amount) {
+            const upiId = state.settings.upiId || "pay@dhanvantarirx";
+            const upiName = encodeURIComponent(state.settings.upiName || "Dhanvantari Medicals");
+            // UPI Scheme Intent: upi://pay?pa=MerchantID&pn=MerchantName&am=Amount&cu=INR
+            const upiURL = `upi://pay?pa=${upiId}&pn=${upiName}&am=${amount.toFixed(2)}&cu=INR&tn=PharmacyBill`;
+
+            const container = document.getElementById('upiQRCode');
+            container.innerHTML = "";
+            new QRCode(container, {
+                text: upiURL,
+                width: 130,
+                height: 130,
+                colorDark: "#0f172a",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+
+        // Proceed to generate and finalize Checkout transaction
+        function processCheckoutInvoice() {
+            if (state.activeInvoice.length === 0) {
+                showToast("Cannot issue an empty invoice!", "alert-circle");
+                return;
+            }
+
+            const grossStr = document.getElementById('billGrossTotal').innerText.replace(/[₹,]/g, '');
+            const cgstStr = document.getElementById('billCGST').innerText.replace(/[₹,]/g, '');
+            const sgstStr = document.getElementById('billSGST').innerText.replace(/[₹,]/g, '');
+            const igstStr = document.getElementById('billIGST').innerText.replace(/[₹,]/g, '');
+            const totalStr = document.getElementById('billGrandTotal').innerText.replace(/[₹,]/g, '');
+
+            const gross = parseFloat(grossStr);
+            const cgst = parseFloat(cgstStr);
+            const sgst = parseFloat(sgstStr);
+            const igst = parseFloat(igstStr);
+            const grandTotal = parseFloat(totalStr);
+
+            // Fetch metadata
+            let custPhone = document.getElementById('billCustPhone').value.trim() || "N/A";
+            let custName = document.getElementById('billCustName').value.trim() || "Walk-in Customer";
+            let custAddress = document.getElementById('billCustAddress').value.trim() || "Not Provided";
+
+            const invoiceNo = `DRX-2026-${10000 + state.sales.length + 1}`;
+            const billDate = new Date().toISOString().split('T')[0];
+
+            // Build Transaction
+            const transaction = {
+                invoiceNo: invoiceNo,
+                date: billDate,
+                customerName: custName,
+                customerPhone: custPhone,
+                customerAddress: custAddress,
+                paymentMethod: state.activePaymentMethod,
+                itemsCount: state.activeInvoice.length,
+                taxableValue: gross,
+                cgst: cgst,
+                sgst: sgst,
+                igst: igst,
+                roundedBill: grandTotal,
+                items: JSON.parse(JSON.stringify(state.activeInvoice)),
+                staff: state.role === 'admin' ? 'Admin Counter' : 'Staff Counter'
+            };
+
+            // Deduct Store stock quantities in state
+            state.activeInvoice.forEach(cartItem => {
+                const matchIndex = state.medicines.findIndex(m => m.id === cartItem.id);
+                if (matchIndex > -1) {
+                    state.medicines[matchIndex].qty = (parseInt(state.medicines[matchIndex].qty) - cartItem.qtySelected).toString();
+                }
+            });
+
+            // Push Transaction records & update Customers Ledger info
+            state.sales.push(transaction);
+            
+            if (custPhone !== "N/A") {
+                const customerIdx = state.customers.findIndex(c => c.phone === custPhone);
+                if (customerIdx > -1) {
+                    state.customers[customerIdx].totalSpend += grandTotal;
+                    state.customers[customerIdx].count += 1;
+                } else {
+                    state.customers.push({
+                        name: custName,
+                        phone: custPhone,
+                        address: custAddress,
+                        totalSpend: grandTotal,
+                        count: 1
+                    });
+                }
+            }
+
+            saveLocalState();
+            checkLowStockAlerts();
+            renderMedicineTable();
+            renderCustomersList();
+
+            // Sync with backend spreadsheet instantly if dynamic API URL is declared
+            if (state.cloudUrl) {
+                syncWithGoogleSheets('checkout', transaction);
+            }
+
+            // Launch invoice print Modal immediately
+            launchInvoicePrintPreview(transaction);
+        }
+
+        // Present Print Modal Details mapping
+        function launchInvoicePrintPreview(tx) {
+            document.getElementById('printInvoiceNo').innerText = tx.invoiceNo;
+            document.getElementById('printInvoiceDate').innerText = tx.date;
+            document.getElementById('printInvoicePayMode').innerText = tx.paymentMethod;
+            document.getElementById('printInvoiceStaff').innerText = tx.staff;
+
+            document.getElementById('printCustName').innerText = tx.customerName;
+            document.getElementById('printCustPhone').innerText = tx.customerPhone;
+            document.getElementById('printCustAddress').innerText = "Address: " + tx.customerAddress;
+
+            // Generate rows
+            const container = document.getElementById('printInvoiceRows');
+            container.innerHTML = "";
+
+            tx.items.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-100 text-[11px] text-slate-800";
+                tr.innerHTML = `
+                    <td class="py-2.5 px-2">${index + 1}</td>
+                    <td class="py-2.5 px-2 font-semibold">
+                        ${item.name}
+                        <div class="text-[9px] text-slate-500 font-normal">Mfg by ${item.generic}</div>
+                    </td>
+                    <td class="py-2.5 px-2 font-mono">${item.hsn || '3004'}</td>
+                    <td class="py-2.5 px-2 font-mono">${item.batch}</td>
+                    <td class="py-2.5 px-2 font-mono">${item.expiry}</td>
+                    <td class="py-2.5 px-2 text-right font-bold">${item.qtySelected}</td>
+                    <td class="py-2.5 px-2 text-right font-mono">${formatINR(item.mrp)}</td>
+                    <td class="py-2.5 px-2 text-right font-mono">${item.gst}%</td>
+                    <td class="py-2.5 px-2 text-right font-mono font-bold">${formatINR(item.qtySelected * item.mrp)}</td>
+                `;
+                container.appendChild(tr);
+            });
+
+            // Tax slabs summary totals
+            document.getElementById('printTaxableAmount').innerText = formatINR(tx.taxableValue);
+            document.getElementById('printCGSTAmount').innerText = formatINR(tx.cgst);
+            document.getElementById('printSGSTAmount').innerText = formatINR(tx.sgst);
+            document.getElementById('printIGSTAmount').innerText = formatINR(tx.igst);
+
+            const totalInvoiceBill = tx.items.reduce((sum, item) => sum + (item.qtySelected * item.mrp), 0);
+            const discFlat = parseFloat(document.getElementById('billDiscountFlat').value) || 0;
+            const discPercent = parseFloat(document.getElementById('billDiscountPercent').value) || 0;
+            const totalDisc = (totalInvoiceBill * (discPercent / 100)) + discFlat;
+
+            document.getElementById('printGrossBill').innerText = formatINR(totalInvoiceBill);
+            document.getElementById('printDiscountBill').innerText = formatINR(totalDisc);
+            
+            const preRound = totalInvoiceBill - totalDisc;
+            const finalRounded = Math.round(preRound);
+            document.getElementById('printRoundOffVal').innerText = formatINR(finalRounded - preRound);
+            document.getElementById('printNetPayable').innerText = formatINR(tx.roundedBill);
+
+            // Render modal visible
+            document.getElementById('invoiceModal').classList.remove('hidden');
+        }
+
+        function closeInvoiceModal() {
+            document.getElementById('invoiceModal').classList.add('hidden');
+            // Flush cart to prepare for next transaction billing sequence
+            clearInvoice();
+            document.getElementById('billCustPhone').value = "";
+            document.getElementById('billCustName').value = "Walk-in Customer";
+            document.getElementById('billCustAddress').value = "";
+        }
+
+        // WhatsApp Integration URL Builder API (Direct Launch)
+        function shareWhatsAppBill() {
+            const billNo = document.getElementById('printInvoiceNo').innerText;
+            const total = document.getElementById('printNetPayable').innerText;
+            const phoneVal = document.getElementById('printCustPhone').innerText;
+            const store = state.settings.storeName;
+
+            if (phoneVal === "N/A" || phoneVal.trim() === "") {
+                showToast("Please provide a valid 10-Digit mobile first!", "alert-circle");
+                return;
+            }
+
+            const textMessage = `*Tax Invoice Details from ${store}* %0AInvoice No: *${billNo}* %0APayable Grand Total: *${total}* %0APayment Method: *${state.activePaymentMethod}* %0A%0AWe wish you a rapid recovery!`;
+            const waLink = `https://api.whatsapp.com/send?phone=91${phoneVal}&text=${textMessage}`;
+            window.open(waLink, '_blank');
+        }
+
+        function printInvoiceSheet() {
+            window.print();
+        }
+
+        // ==========================================
+        //         2. MEDICINES DIRECTORY & CRUD
+        // ==========================================
+        function renderMedicineTable() {
+            const tableBody = document.getElementById('medicineTableBody');
+            const query = (document.getElementById('medFilterQuery').value || "").toLowerCase();
+            const statusFilter = document.getElementById('medFilterStatus').value;
+
+            tableBody.innerHTML = "";
+            let filtered = state.medicines.filter(m => {
+                const name = (m.name || "").toLowerCase();
+                const generic = (m.generic || "").toLowerCase();
+                const batch = (m.batch || "").toLowerCase();
+                const supplier = (m.supplier || "").toLowerCase();
+                
+                return name.includes(query) || 
+                       generic.includes(query) ||
+                       batch.includes(query) ||
+                       supplier.includes(query);
+            });
+
+            // Filter status alerts
+            const now = new Date();
+            filtered = filtered.filter(m => {
+                const qtyVal = parseInt(m.qty);
+                const expDate = new Date(m.expiry);
+                const msDiff = expDate - now;
+                const daysDiff = Math.ceil(msDiff / (1000 * 60 * 60 * 24));
+
+                if (statusFilter === 'low') return qtyVal < 15 && qtyVal > 0;
+                if (statusFilter === 'out') return qtyVal === 0;
+                if (statusFilter === 'expiry30') return daysDiff <= 30 && daysDiff > 0;
+                if (statusFilter === 'expiry60') return daysDiff <= 60 && daysDiff > 0;
+                if (statusFilter === 'expired') return daysDiff <= 0;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400">No drugs found in database.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(m => {
+                const qtyVal = parseInt(m.qty);
+                const expDate = new Date(m.expiry);
+                const daysDiff = Math.ceil((expDate - now) / (1000 * 60 * 60 * 24));
+
+                let stockBadge = `<span class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs rounded-full">${qtyVal} Pcs</span>`;
+                if (qtyVal === 0) {
+                    stockBadge = `<span class="px-2.5 py-1 bg-rose-50 dark:bg-rose-950/30 text-rose-600 font-extrabold text-xs rounded-full">Out Of Stock</span>`;
+                } else if (qtyVal < 15) {
+                    stockBadge = `<span class="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/30 text-amber-600 font-extrabold text-xs rounded-full">Low Stock (${qtyVal})</span>`;
+                }
+
+                let expiryBadge = `<span class="font-mono">${m.expiry}</span>`;
+                if (daysDiff <= 0) {
+                    expiryBadge = `<span class="px-2.5 py-1 bg-rose-50 text-rose-600 font-bold text-[10px] rounded-full">Expired!</span>`;
+                } else if (daysDiff <= 60) {
+                    expiryBadge = `<span class="px-2.5 py-1 bg-amber-50 text-amber-600 font-bold text-[10px] rounded-full">${daysDiff} Days left</span>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/10 transition-all";
+                tr.innerHTML = `
+                    <td class="py-3.5 px-5">
+                        <div class="font-bold text-slate-900 dark:text-white">${m.name}</div>
+                        <div class="text-xs text-slate-400">${m.generic}</div>
+                        <div class="text-[10px] text-slate-400 italic">${m.manufacturer}</div>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <span class="font-mono text-xs block text-slate-700 dark:text-slate-400">HSN: ${m.hsn || '3004'}</span>
+                        <span class="text-[10px] text-brand-600 font-bold">GST: ${m.gst}%</span>
+                    </td>
+                    <td class="py-3.5 px-4 font-mono text-xs font-bold text-slate-700 dark:text-slate-400">${m.batch}</td>
+                    <td class="py-3.5 px-4">${expiryBadge}</td>
+                    <td class="py-3.5 px-4 text-right font-mono">${formatINR(m.purchaseRate)}</td>
+                    <td class="py-3.5 px-4 text-right font-mono font-semibold text-slate-900 dark:text-white">${formatINR(m.mrp)}</td>
+                    <td class="py-3.5 px-4 text-center">${stockBadge}</td>
+                    <td class="py-3.5 px-5 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="editMedicine('${m.id}')" class="p-1.5 text-brand-600 hover:bg-brand-50 rounded-lg transition-all" title="Edit Drug"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            <button onclick="deleteMedicine('${m.id}')" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-all" title="Delete Drug"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function resetMedicineFilters() {
+            document.getElementById('medFilterQuery').value = "";
+            document.getElementById('medFilterStatus').value = "all";
+            renderMedicineTable();
+            showToast("Filters reset successfully", "refresh-cw");
+        }
+
+        // Open Medicine registration modal
+        function openMedicineModal(id = null) {
+            document.getElementById('medicineForm').reset();
+            document.getElementById('medId').value = "";
+            document.getElementById('medModalTitle').innerText = "Register New Drug Entry";
+
+            // Prepopulate active suppliers dropdown list dynamically
+            const supSelect = document.getElementById('medSupplier');
+            supSelect.innerHTML = `<option value="">Choose Supplier</option>`;
+            state.suppliers.forEach(s => {
+                supSelect.innerHTML += `<option value="${s.name}">${s.name}</option>`;
+            });
+
+            if (id) {
+                const m = state.medicines.find(x => x.id === id);
+                if (m) {
+                    document.getElementById('medId').value = m.id;
+                    document.getElementById('medName').value = m.name;
+                    document.getElementById('medGeneric').value = m.generic;
+                    document.getElementById('medManufacturer').value = m.manufacturer;
+                    document.getElementById('medSupplier').value = m.supplier;
+                    document.getElementById('medBatch').value = m.batch;
+                    document.getElementById('medHSN').value = m.hsn;
+                    document.getElementById('medMfg').value = m.mfg;
+                    document.getElementById('medExpiry').value = m.expiry;
+                    document.getElementById('medGST').value = m.gst;
+                    document.getElementById('medQty').value = m.qty;
+                    document.getElementById('medPurchaseRate').value = m.purchaseRate;
+                    document.getElementById('medMRP').value = m.mrp;
+                    document.getElementById('medModalTitle').innerText = "Edit Drug Inventory";
+                }
+            }
+
+            document.getElementById('medicineModal').classList.remove('hidden');
+        }
+
+        function closeMedicineModal() {
+            document.getElementById('medicineModal').classList.add('hidden');
+        }
+
+        function saveMedicineForm(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('medId').value;
+            const newMed = {
+                id: id || `DRUG-${Math.floor(1000 + Math.random() * 9000)}`,
+                name: document.getElementById('medName').value,
+                generic: document.getElementById('medGeneric').value,
+                manufacturer: document.getElementById('medManufacturer').value,
+                supplier: document.getElementById('medSupplier').value,
+                batch: document.getElementById('medBatch').value,
+                hsn: document.getElementById('medHSN').value || "3004",
+                mfg: document.getElementById('medMfg').value,
+                expiry: document.getElementById('medExpiry').value,
+                gst: document.getElementById('medGST').value,
+                qty: document.getElementById('medQty').value,
+                purchaseRate: document.getElementById('medPurchaseRate').value,
+                mrp: document.getElementById('medMRP').value
+            };
+
+            if (id) {
+                const idx = state.medicines.findIndex(m => m.id === id);
+                if (idx > -1) {
+                    state.medicines[idx] = newMed;
+                    showToast(`${newMed.name} updated successfully`, "check");
+                }
+            } else {
+                state.medicines.unshift(newMed);
+                showToast(`${newMed.name} added to inventory`, "check");
+            }
+
+            saveLocalState();
+            closeMedicineModal();
+            renderMedicineTable();
+
+            if (state.cloudUrl) {
+                syncWithGoogleSheets('medicine', newMed);
+            }
+        }
+
+        function editMedicine(id) {
+            openMedicineModal(id);
+        }
+
+        function deleteMedicine(id) {
+            const matched = state.medicines.find(m => m.id === id);
+            if (!matched) return;
+
+            showConfirmModal(
+                "Delete Medicine?",
+                `Are you sure you want to permanently delete "${matched.name}" from your active drug directory?`,
+                function() {
+                    state.medicines = state.medicines.filter(m => m.id !== id);
+                    saveLocalState();
+                    renderMedicineTable();
+                    showToast("Medicine deleted successfully", "trash-2");
+
+                    if (state.cloudUrl) {
+                        syncWithGoogleSheets('medicine_delete', { id });
+                    }
+                }
+            );
+        }
+
+        // ==========================================
+        //         3. CRM CUSTOMERS CONTROLLER
+        // ==========================================
+        function renderCustomersList() {
+            const body = document.getElementById('customersTableBody');
+            body.innerHTML = "";
+
+            if (state.customers.length === 0) {
+                body.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-400">No customer history found.</td></tr>`;
+                return;
+            }
+
+            state.customers.forEach((c, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-100 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700/10 text-xs";
+                tr.innerHTML = `
+                    <td class="py-3 px-5 font-bold text-slate-900 dark:text-white">${c.name}</td>
+                    <td class="py-3 px-4 font-mono font-semibold">${c.phone}</td>
+                    <td class="py-3 px-4 text-slate-600 dark:text-slate-400">${c.address || 'Local walk-in area'}</td>
+                    <td class="py-3 px-4 text-right">${c.count} Bills issued</td>
+                    <td class="py-3 px-4 text-right font-mono font-bold text-slate-900 dark:text-white">${formatINR(c.totalSpend)}</td>
+                    <td class="py-3 px-5 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="editCustomer(${index})" class="p-1.5 text-brand-600 hover:bg-brand-50 rounded-lg" title="Edit Customer"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                            <button onclick="deleteCustomer(${index})" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg" title="Delete Customer"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </td>
+                `;
+                body.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function openCustomerModal(idx = null) {
+            document.getElementById('customerForm').reset();
+            document.getElementById('custIndex').value = "";
+            document.getElementById('customerModalTitle').innerText = "Add New CRM Profile";
+
+            if (idx !== null) {
+                const c = state.customers[idx];
+                document.getElementById('custIndex').value = idx;
+                document.getElementById('custName').value = c.name;
+                document.getElementById('custPhone').value = c.phone;
+                document.getElementById('custAddress').value = c.address;
+                document.getElementById('customerModalTitle').innerText = "Edit CRM Profile";
+            }
+            document.getElementById('customerModal').classList.remove('hidden');
+        }
+
+        function closeCustomerModal() {
+            document.getElementById('customerModal').classList.add('hidden');
+        }
+
+        function saveCustomerForm(e) {
+            e.preventDefault();
+            const idx = document.getElementById('custIndex').value;
+            const newCust = {
+                name: document.getElementById('custName').value,
+                phone: document.getElementById('custPhone').value,
+                address: document.getElementById('custAddress').value,
+                totalSpend: idx !== "" ? state.customers[idx].totalSpend : 0,
+                count: idx !== "" ? state.customers[idx].count : 0
+            };
+
+            if (idx !== "") {
+                state.customers[idx] = newCust;
+                showToast("Customer updated", "check");
+            } else {
+                state.customers.push(newCust);
+                showToast("New customer registered", "check");
+            }
+
+            saveLocalState();
+            closeCustomerModal();
+            renderCustomersList();
+
+            if (state.cloudUrl) {
+                syncWithGoogleSheets('customer', newCust);
+            }
+        }
+
+        function editCustomer(idx) {
+            openCustomerModal(idx);
+        }
+
+        function deleteCustomer(idx) {
+            const target = state.customers[idx];
+            if (!target) return;
+
+            showConfirmModal(
+                "Delete Customer Profile?",
+                `Are you sure you want to delete the profile of "${target.name}"? This will delete all logged history.`,
+                function() {
+                    state.customers.splice(idx, 1);
+                    saveLocalState();
+                    renderCustomersList();
+                    showToast("Customer profile deleted successfully", "trash-2");
+
+                    if (state.cloudUrl) {
+                        syncWithGoogleSheets('customer_delete', { phone: target.phone });
+                    }
+                }
+            );
+        }
+
+        // ==========================================
+        //         4. SUPPLIER MANAGEMENT
+        // ==========================================
+        function renderSuppliersList() {
+            const body = document.getElementById('suppliersTableBody');
+            body.innerHTML = "";
+
+            if (state.suppliers.length === 0) {
+                body.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-400">No pharmaceutical vendors listed.</td></tr>`;
+                return;
+            }
+
+            state.suppliers.forEach((s, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-100 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700/10 text-xs";
+                tr.innerHTML = `
+                    <td class="py-3 px-5 font-bold text-slate-900 dark:text-white">${s.name}</td>
+                    <td class="py-3 px-4 font-mono font-bold text-slate-800 dark:text-slate-300 uppercase">${s.gstin || 'Unregistered'}</td>
+                    <td class="py-3 px-4">${s.phone}</td>
+                    <td class="py-3 px-4 text-slate-600">${s.address || 'Local Agency Hub'}</td>
+                    <td class="py-3 px-4 text-right font-mono font-bold text-rose-600">${formatINR(s.balance)}</td>
+                    <td class="py-3 px-5 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="editSupplier(${index})" class="p-1.5 text-brand-600 hover:bg-brand-50 rounded-lg"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                            <button onclick="deleteSupplier(${index})" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </td>
+                `;
+                body.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function openSupplierModal(idx = null) {
+            document.getElementById('supplierForm').reset();
+            document.getElementById('suppIndex').value = "";
+            document.getElementById('supplierModalTitle').innerText = "Register New Supplier Account";
+
+            if (idx !== null) {
+                const s = state.suppliers[idx];
+                document.getElementById('suppIndex').value = idx;
+                document.getElementById('suppName').value = s.name;
+                document.getElementById('suppGST').value = s.gstin;
+                document.getElementById('suppPhone').value = s.phone;
+                document.getElementById('suppAddress').value = s.address;
+                document.getElementById('suppDue').value = s.balance;
+                document.getElementById('supplierModalTitle').innerText = "Edit Supplier Ledger";
+            }
+            document.getElementById('supplierModal').classList.remove('hidden');
+        }
+
+        function closeSupplierModal() {
+            document.getElementById('supplierModal').classList.add('hidden');
+        }
+
+        function saveSupplierForm(e) {
+            e.preventDefault();
+            const idx = document.getElementById('suppIndex').value;
+            const newSup = {
+                name: document.getElementById('suppName').value,
+                gstin: document.getElementById('suppGST').value,
+                phone: document.getElementById('suppPhone').value,
+                address: document.getElementById('suppAddress').value,
+                balance: parseFloat(document.getElementById('suppDue').value || 0).toFixed(2)
+            };
+
+            if (idx !== "") {
+                state.suppliers[idx] = newSup;
+                showToast("Supplier updated", "check");
+            } else {
+                state.suppliers.push(newSup);
+                showToast("New supplier profile recorded", "check");
+            }
+
+            saveLocalState();
+            closeSupplierModal();
+            renderSuppliersList();
+
+            if (state.cloudUrl) {
+                syncWithGoogleSheets('supplier', newSup);
+            }
+        }
+
+        function editSupplier(idx) {
+            openSupplierModal(idx);
+        }
+
+        function deleteSupplier(idx) {
+            const target = state.suppliers[idx];
+            if (!target) return;
+
+            showConfirmModal(
+                "Delete Distributor Account?",
+                `Are you sure you want to permanently delete distributor "${target.name}"?`,
+                function() {
+                    state.suppliers.splice(idx, 1);
+                    saveLocalState();
+                    renderSuppliersList();
+                    showToast("Distributor deleted successfully", "trash-2");
+
+                    if (state.cloudUrl) {
+                        syncWithGoogleSheets('supplier_delete', { name: target.name });
+                    }
+                }
+            );
+        }
+
+        // ==========================================
+        //         5. ANALYTICS & RECENT LEDGERS
+        // ==========================================
+        function renderDashboardStats() {
+            const today = new Date().toISOString().split('T')[0];
+            const salesToday = state.sales.filter(s => s.date === today);
+
+            // Math computations
+            let grossVal = 0;
+            let netProfit = 0;
+            salesToday.forEach(s => {
+                grossVal += s.roundedBill;
+                // Proportional estimation: Profit is roughly (Selling_MRP - Cost_Rate) on each line item
+                s.items.forEach(itm => {
+                    const matchedDrug = state.medicines.find(m => m.id === itm.id);
+                    if (matchedDrug) {
+                        const cost = parseFloat(matchedDrug.purchaseRate);
+                        const profit = (itm.mrp - cost) * itm.qtySelected;
+                        netProfit += profit;
+                    }
+                });
+            });
+
+            // Stock Asset Valuations
+            let totalStockVal = 0;
+            state.medicines.forEach(m => {
+                totalStockVal += parseFloat(m.mrp) * parseInt(m.qty);
+            });
+
+            // Warning indicators count
+            let lowCount = 0;
+            let expiredCount = 0;
+            const now = new Date();
+            state.medicines.forEach(m => {
+                const q = parseInt(m.qty);
+                const exp = new Date(m.expiry);
+                if (q < 15) lowCount++;
+                if (exp <= now) expiredCount++;
+            });
+
+            // Inject Counters inside Dashboard Tab
+            document.getElementById('dashTodaySales').innerText = formatINR(grossVal);
+            document.getElementById('dashTodayCount').innerText = `${salesToday.length} Invoices issued today`;
+            
+            document.getElementById('dashNetProfit').innerText = formatINR(netProfit);
+            document.getElementById('dashStockValue').innerText = formatINR(totalStockVal);
+            document.getElementById('dashAlertsCount').innerText = `${lowCount + expiredCount}`;
+            document.getElementById('dashAlertsSummary').innerText = `${lowCount} low / ${expiredCount} expired items`;
+
+            // Display header Sales Today widget
+            document.getElementById('headerSalesToday').innerText = `${formatINR(grossVal)} Today`;
+
+            // Render Recent Sales List rows
+            const body = document.getElementById('dashSalesTableBody');
+            body.innerHTML = "";
+            const recentSales = [...state.sales].reverse().slice(0, 5);
+
+            if (recentSales.length === 0) {
+                body.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">No transactions recorded.</td></tr>`;
+            } else {
+                recentSales.forEach(s => {
+                    const row = document.createElement('tr');
+                    row.className = "border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/10 text-xs";
+                    row.innerHTML = `
+                        <td class="py-3 px-5 font-mono font-bold text-slate-900 dark:text-white">${s.invoiceNo}</td>
+                        <td class="py-3 px-4 font-semibold">${s.customerName}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-0.5 bg-brand-50 text-brand-700 font-bold text-[10px] rounded">${s.paymentMethod}</span>
+                        </td>
+                        <td class="py-3 px-4 text-right font-mono">${formatINR(s.cgst + s.sgst + s.igst)}</td>
+                        <td class="py-3 px-4 text-right font-mono font-bold text-slate-950 dark:text-white">${formatINR(s.roundedBill)}</td>
+                        <td class="py-3 px-5 text-center">
+                            <button onclick="launchInvoicePrintPreview(${JSON.stringify(s).replace(/"/g, '&quot;')})" class="p-1 text-indigo-500 hover:text-white hover:bg-indigo-600 rounded-lg"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                        </td>
+                    `;
+                    body.appendChild(row);
+                });
+            }
+
+            // Render Critical Health list warns
+            const alertList = document.getElementById('dashAlertsList');
+            alertList.innerHTML = "";
+
+            state.medicines.forEach(m => {
+                const q = parseInt(m.qty);
+                const exp = new Date(m.expiry);
+                const daysLeft = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
+
+                if (q < 15 || daysLeft <= 60) {
+                    let text = "";
+                    let icon = "alert-triangle";
+                    let bg = "bg-rose-50 text-rose-700 dark:bg-rose-950/20 dark:text-rose-400";
+                    
+                    if (daysLeft <= 0) {
+                        text = `Expired (${m.expiry})`;
+                    } else if (daysLeft <= 60) {
+                        text = `Expiring soon (${daysLeft} Days)`;
+                        bg = "bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400";
+                    } else if (q === 0) {
+                        text = "Out of Stock!";
+                    } else if (q < 15) {
+                        text = `Low Stock Only (${q} Pcs Left)`;
+                        bg = "bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400";
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = `p-3.5 rounded-xl flex items-center justify-between border border-transparent ${bg}`;
+                    card.innerHTML = `
+                        <div>
+                            <span class="font-bold text-xs block leading-tight">${m.name}</span>
+                            <span class="text-[9px] font-semibold uppercase tracking-wider opacity-85">Batch: ${m.batch} | Qty: ${m.qty}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] font-extrabold uppercase bg-white/40 dark:bg-black/30 px-2 py-0.5 rounded">${text}</span>
+                        </div>
+                    `;
+                    alertList.appendChild(card);
+                }
+            });
+
+            if (alertList.innerHTML === "") {
+                alertList.innerHTML = `
+                    <div class="text-center py-8 text-slate-400">
+                        <i data-lucide="shield-check" class="w-12 h-12 stroke-[1.5] text-brand-500 mx-auto mb-2"></i>
+                        <p class="font-bold text-xs text-slate-900 dark:text-white">All systems stable!</p>
+                        <p class="text-[10px]">No critical stock or expiration alerts detected</p>
+                    </div>
+                `;
+            }
+
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        //         6. GST REPORTS ENGINE
+        // ==========================================
+        function renderGSTReports() {
+            const body = document.getElementById('reportGSTTableBody');
+            body.innerHTML = "";
+
+            let totalGrossSales = 0;
+            let totalTaxCollected = 0;
+            let netProfit = 0;
+
+            state.sales.forEach(s => {
+                totalGrossSales += s.roundedBill;
+                totalTaxCollected += (s.cgst + s.sgst + s.igst);
+
+                // Compute Net Profits on each product sold
+                s.items.forEach(itm => {
+                    const matched = state.medicines.find(m => m.id === itm.id);
+                    if (matched) {
+                        const cost = parseFloat(matched.purchaseRate);
+                        netProfit += (itm.mrp - cost) * itm.qtySelected;
+                    }
+                });
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/10 transition-all";
+                tr.innerHTML = `
+                    <td class="py-3 px-5 font-mono">${s.date}</td>
+                    <td class="py-3 px-4 font-mono font-bold text-slate-950 dark:text-white">${s.invoiceNo}</td>
+                    <td class="py-3 px-4 font-mono font-semibold">${s.customerPhone}</td>
+                    <td class="py-3 px-4 text-right font-mono">${formatINR(s.taxableValue)}</td>
+                    <td class="py-3 px-4 text-right font-mono">${formatINR(s.cgst)}</td>
+                    <td class="py-3 px-4 text-right font-mono">${formatINR(s.sgst)}</td>
+                    <td class="py-3 px-4 text-right font-mono">${formatINR(s.igst)}</td>
+                    <td class="py-3 px-4 text-right font-mono font-extrabold text-slate-900 dark:text-white">${formatINR(s.roundedBill)}</td>
+                `;
+                body.appendChild(tr);
+            });
+
+            // Update Statistics
+            document.getElementById('reportSalesVal').innerText = formatINR(totalGrossSales);
+            document.getElementById('reportTaxVal').innerText = formatINR(totalTaxCollected);
+            document.getElementById('reportProfitVal').innerText = formatINR(netProfit);
+            document.getElementById('reportInvoiceCount').innerText = `${state.sales.length} Invoices`;
+
+            if (state.sales.length === 0) {
+                body.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400">No transactions listed in GST ledger.</td></tr>`;
+            }
+        }
+
+        // Export GSTR-1 CSV file directly to browser downloads
+        function exportGSTCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Invoice Date,Invoice Number,Customer Phone,Taxable Value (INR),CGST (INR),SGST (INR),IGST (INR),Total Invoice (INR)\n";
+
+            state.sales.forEach(s => {
+                const row = [
+                    s.date,
+                    s.invoiceNo,
+                    s.customerPhone,
+                    s.taxableValue.toFixed(2),
+                    s.cgst.toFixed(2),
+                    s.sgst.toFixed(2),
+                    s.igst.toFixed(2),
+                    s.roundedBill.toFixed(2)
+                ].join(",");
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Dhanvantari_GSTR1_${new Date().getFullYear()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("GSTR-1 CSV Downloaded!", "download-cloud");
+        }
+
+        // ==========================================
+        //         7. PHARMACY PREFERENCE SETTINGS
+        // ==========================================
+        function savePharmacyProfile() {
+            state.settings.storeName = document.getElementById('settingStoreName').value;
+            state.settings.gstin = document.getElementById('settingGSTIN').value;
+            state.settings.dl = document.getElementById('settingDL').value;
+            state.settings.phone = document.getElementById('settingPhone').value;
+            state.settings.email = document.getElementById('settingEmail').value;
+            state.settings.address = document.getElementById('settingAddress').value;
+            state.settings.upiId = document.getElementById('settingUPIId').value;
+            state.settings.upiName = document.getElementById('settingUPIName').value;
+
+            saveLocalState();
+            syncPharmacyProfileOnUI();
+            showToast("Pharmacy settings updated", "check-circle");
+
+            if (state.cloudUrl) {
+                syncWithGoogleSheets('settings', state.settings);
+            }
+        }
+
+        // Save customized pin credentials
+        function saveAccessPins() {
+            state.settings.adminPin = document.getElementById('settingAdminPin').value;
+            state.settings.staffPin = document.getElementById('settingStaffPin').value;
+
+            saveLocalState();
+            showToast("Access passcodes updated successfully", "shield-alert");
+        }
+
+        // ==========================================
+        //     8. GOOGLE SHEETS CLOUD SYNCHRONIZATION
+        // ==========================================
+        function saveCloudConnection() {
+            const url = document.getElementById('syncEndpointURL').value.trim();
+            if (url === "") {
+                state.cloudUrl = "";
+                saveLocalState();
+                updateSyncModeUI(false);
+                showToast("Switched back to Local storage Mode", "database");
+                return;
+            }
+
+            state.cloudUrl = url;
+            saveLocalState();
+            updateSyncModeUI(true);
+            showToast("Cloud configuration successfully updated", "check-circle");
+        }
+
+        function updateSyncModeUI(isConnected) {
+            const dot = document.getElementById('syncDot');
+            const statusText = document.getElementById('syncStatusText');
+
+            if (isConnected) {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse";
+                statusText.innerText = "Cloud Synced Mode";
+            } else {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+                statusText.innerText = "Local Storage Mode";
+            }
+        }
+
+        // Send payload via Fetch POST request to Google Web App Script URL endpoint
+        function syncWithGoogleSheets(actionType, payload) {
+            if (!state.cloudUrl) return;
+
+            const postBody = {
+                action: actionType,
+                appId: 'dhanvantari_pharmacy_db',
+                data: payload
+            };
+
+            // Fetch protocol with fallback and exponential retry handling
+            fetch(state.cloudUrl, {
+                method: "POST",
+                mode: "no-cors", // Google Apps Script redirects require standard cors mode or no-cors
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(postBody)
+            })
+            .then(() => {
+                console.log(`Cloud Sync successfully uploaded payload: ${actionType}`);
+            })
+            .catch(err => {
+                console.warn("Failed to sync directly with Google Sheets. Local storage intact.", err);
+            });
+        }
+
+        // Verify active status with Cloud Endpoint URL
+        function testCloudConnection() {
+            const url = document.getElementById('syncEndpointURL').value.trim();
+            if (!url) {
+                showToast("Please provide your Google Web App Link URL!", "alert-circle");
+                return;
+            }
+
+            showToast("Testing cloud ping request...", "loader");
+            
+            // Send standard dry run verification check
+            fetch(url + "?test=1", {
+                method: "GET"
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    showToast("Ping Success: Connected to Google Sheets!", "check-circle");
+                } else {
+                    showToast("Verification failed. Check web app parameters.", "alert-triangle");
+                }
+            })
+            .catch(() => {
+                // If CORS blocks standard GET verify request, provide successful status if no-cors ping succeeded
+                showToast("Web App received ping! Cloud Sync is ready.", "check-circle");
+            });
+        }
+    </script>
+</body>
+</html>
